@@ -24,6 +24,8 @@
     overflow: scroll;
     display: block;
     transition: .2s;
+    min-height: 160px;
+    position: relative;
 }
 .code-wrapper .bottom-window.fullscreen {
     max-height: 100%;
@@ -54,6 +56,7 @@
 .code-wrapper .bottom-window.console {
     overflow: hidden;
     height: 300px;
+    max-height: none;
 }
 .code-wrapper .bottom-window.console .bottom-window__header {
     position: static;
@@ -62,10 +65,48 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
-    height: 168px;
+    height: calc(100% - 42px);
     padding: 0px;
     padding-left: 10px;
     padding-right: 10px;
+}
+.code-wrapper .bottom-window__resize-handle {
+    position: absolute;
+    top: -4px;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    cursor: ns-resize;
+    z-index: 4;
+}
+.code-wrapper .bottom-window__resize-handle::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 3px;
+    width: 42px;
+    height: 2px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: var(--text-color);
+    opacity: 0;
+    transition: opacity .2s;
+}
+.code-wrapper .bottom-window__resize-handle:hover::after,
+.code-wrapper .bottom-window.resizing .bottom-window__resize-handle::after {
+    opacity: .35;
+}
+body.bottom-window-resizing {
+    cursor: ns-resize;
+    user-select: none;
+}
+.bottom-window__resize-preview {
+    position: fixed;
+    height: 2px;
+    border-top: 2px solid rgba(255, 255, 255, .9);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .45);
+    pointer-events: none;
+    z-index: 9999;
 }
 .code-wrapper .bottom-window .bottom-window__content p,
 .code-wrapper .bottom-window .bottom-window__content h1,

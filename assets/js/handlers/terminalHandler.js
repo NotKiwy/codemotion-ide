@@ -7,6 +7,7 @@ export class Console {
 
         this.term = new Terminal(
             { 
+                convertEol: true,
                 cursorBlink: true,
                 fontFamily: "Consolas, monospace",
                 fontSize: 14
@@ -15,10 +16,25 @@ export class Console {
 
         this.term.loadAddon(fitAddon)
         this.term.open(this.body)
+        this.fitAddon = fitAddon
+        this.handleResize = () => this.fit()
+        this.disposed = false
+        this.fitFrame = null
+        this.isPanelResizing = false
+        this.handlePanelResizeStart = () => {
+            this.isPanelResizing = true
+        }
+        this.handlePanelResizeEnd = () => {
+            this.isPanelResizing = false
+            this.fit()
+        }
 
-        requestAnimationFrame(() => {
-            fitAddon.fit()
-        })
+        this.fit()
+        this.resizeObserver = new ResizeObserver(() => this.fit())
+        this.resizeObserver.observe(this.body)
+        window.addEventListener("resize", this.handleResize)
+        this.console.win.addEventListener("bottom-window-resize-start", this.handlePanelResizeStart)
+        this.console.win.addEventListener("bottom-window-resize-end", this.handlePanelResizeEnd)
         
         this.buffer = ""
         this.history = []
@@ -63,6 +79,19 @@ export class Console {
         this.prompt()
         this.registerEvents()
         this.setupIPC()
+        this.console.onHide(() => this.dispose())
+    }
+
+    fit() {
+        if (this.disposed) return
+        if (this.isPanelResizing) return
+        if (this.fitFrame) return
+
+        this.fitFrame = requestAnimationFrame(() => {
+            this.fitFrame = null
+            if (this.disposed) return
+            this.fitAddon?.fit()
+        })
     }
 
     prompt() {
@@ -82,7 +111,6 @@ export class Console {
                 this.term.write("^C\r\n")
                 window.electron?.killProcess?.()
                 this.isWaitingForOutput = false
-                this.prompt()
             }
             return
         }
@@ -207,10 +235,14 @@ export class Console {
 
     setupIPC() {
         if(window.electron && window.electron.onCommandResult) {
-            window.electron.onCommandResult((result) => {
+            this.commandResultHandler = (result) => {
+                if (this.disposed) return
+
                 console.log('[Console] Received result:', result)
                 this.handleTerminalResult(result)
-            })
+            }
+
+            this.removeCommandResultHandler = window.electron.onCommandResult(this.commandResultHandler)
         } else {
             console.warn('[Console] onCommandResult not available')
         }
@@ -258,5 +290,20 @@ export class Console {
             this.isWaitingForOutput = false
             this.prompt()
         }
+    }
+
+    dispose() {
+        if (this.disposed) return
+
+        this.disposed = true
+        this.isWaitingForOutput = false
+        window.electron?.cleanupTerminal?.()
+        this.resizeObserver?.disconnect()
+        window.removeEventListener("resize", this.handleResize)
+        this.console.win.removeEventListener("bottom-window-resize-start", this.handlePanelResizeStart)
+        this.console.win.removeEventListener("bottom-window-resize-end", this.handlePanelResizeEnd)
+        this.removeCommandResultHandler?.()
+        if (this.fitFrame) cancelAnimationFrame(this.fitFrame)
+        this.term?.dispose()
     }
 }

@@ -38,7 +38,7 @@ require("./helpers/getPython.js")
 require("./app/auth.js")
 require("./app/electron/live-server.js")
 require("./app/runtime/runtimeHandler.js")
-require("./app/helpers/terminal.js")
+const { terminalManager } = require("./app/helpers/terminal.js")
 
 const { createDebuggerWindow } = require("./helpers/debuggerWindow/debuggerWindow.js");
 const { createSplashWindow, updateSplash } = require('./app/splash.js');
@@ -169,6 +169,8 @@ async function createWindow() {
 }
 
 ipcMain.on("close", () => {
+    terminalManager.killProcessTree(true);
+    terminalManager.cleanupInputHandler();
     app.quit();
 });
 
@@ -183,6 +185,8 @@ ipcMain.on("fullscreen", () => {
 });
 
 ipcMain.on("reload", () => {
+    terminalManager.killProcessTree(true);
+    terminalManager.cleanupInputHandler();
     app.relaunch();
     app.quit(); 
 });
@@ -458,11 +462,19 @@ ipcMain.handle("get-platform", (e) => {
 
 app.whenReady().then(createWindow);
 
+app.on('before-quit', () => {
+    terminalManager.killProcessTree(true);
+    terminalManager.cleanupInputHandler();
+});
+
 setInterval(() => {
     workSeconds += 0.1
 }, 100)
 
 app.on('window-all-closed', () => {
+    terminalManager.killProcessTree(true);
+    terminalManager.cleanupInputHandler();
+
     if (process.platform !== 'darwin') app.quit();
 
     const settings = readSettings()

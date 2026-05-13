@@ -56,7 +56,12 @@ contextBridge.exposeInMainWorld('electron', {
     sendCommand: (data) => ipcRenderer.send("terminal-command", data),
     sendInput: (input) => ipcRenderer.send("terminal-input", input),
     killProcess: () => ipcRenderer.send("terminal-kill"),
-    onCommandResult: (callback) => ipcRenderer.on("terminal-result", (event, result) => callback(result)),
+    cleanupTerminal: () => ipcRenderer.send("terminal-cleanup"),
+    onCommandResult: (callback) => {
+        const listener = (event, result) => callback(result)
+        ipcRenderer.on("terminal-result", listener)
+        return () => ipcRenderer.removeListener("terminal-result", listener)
+    },
 
     requestExtensions: () => ipcRenderer.invoke("request-extensions"),
     requestExtension: (name) => ipcRenderer.invoke("request-extension", name),

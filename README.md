@@ -2,7 +2,7 @@
 <div align="center">
     <img width="100" height="100" alt="cdmtn-ide-logo" src="https://github.com/user-attachments/assets/76c08ac4-45ac-4f9a-966e-e577d288dd44" />
 </div>
-<h1 align="center">CodeMotion IDE <br>
+<h1 align="center">CodeMotion IDE<br>
 (Beta test)</h1>
 
 > [!IMPORTANT]

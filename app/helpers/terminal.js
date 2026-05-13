@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 const { ipcMain } = require('electron');
 const fs = require('fs');
 const os = require('os');
@@ -59,11 +59,29 @@ class TerminalManager {
 
     terminateProcess() {
         if (this.activeProcess && !this.activeProcess.killed) {
-            try {
-                this.activeProcess.kill('SIGTERM');
-            } catch (err) {
-                console.error(`[Terminal] Error terminating process: ${err.message}`);
+            this.killProcessTree(false);
+        }
+    }
+
+    killProcessTree(force = true) {
+        if (!this.activeProcess || this.activeProcess.killed) return;
+
+        const pid = this.activeProcess.pid;
+
+        try {
+            if (process.platform === 'win32') {
+                const args = ['/pid', String(pid), '/T'];
+                if (force) args.push('/F');
+
+                spawnSync('taskkill.exe', args, {
+                    windowsHide: true,
+                    stdio: 'ignore'
+                });
+            } else {
+                this.activeProcess.kill(force ? 'SIGKILL' : 'SIGTERM');
             }
+        } catch (err) {
+            console.error(`[Terminal] Error killing process tree: ${err.message}`);
         }
     }
 
@@ -186,12 +204,12 @@ class TerminalManager {
         console.log(`[Terminal] Killing process with PID: ${this.activeProcess.pid}`);
 
         try {
-            this.activeProcess.kill('SIGTERM');
+            this.killProcessTree(false);
 
             const forceKillTimeout = setTimeout(() => {
                 if (this.activeProcess && !this.activeProcess.killed) {
                     console.log(`[Terminal] Force killing process`);
-                    this.activeProcess.kill('SIGKILL');
+                    this.killProcessTree(true);
                 }
             }, 2000);
 
@@ -221,8 +239,8 @@ ipcMain.on("terminal-kill", (event) => {
 
 ipcMain.on("terminal-cleanup", (event) => {
     console.log("[Terminal] Cleanup requested");
-    terminalManager.terminateProcess();
+    terminalManager.killProcessTree(true);
     terminalManager.cleanupInputHandler();
 });
 
-module.exports = { TerminalManager };
+module.exports = { TerminalManager, terminalManager };
