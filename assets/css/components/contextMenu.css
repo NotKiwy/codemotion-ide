@@ -1,0 +1,95 @@
+.tooltip {
+    background-color: var(--body-color);
+    border: 1px solid var(--block-divider-border-color);
+    box-shadow: #00000030 0px 2px 11px 0px;
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    font-family: inherit;
+    width: fit-content;
+    white-space: nowrap;
+    color: var(--text-color);
+}
+.tooltip[data-show] {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.context-menu {
+    left: 728px;
+    top: 307px;
+    padding: 5px;
+    position: absolute;
+    width: fit-content;
+    height: fit-content;
+    min-width: 250px;
+    z-index: 9;
+    background: var(--context-body);
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--context-border);
+    border-radius: 10px;
+    transition: .2s;
+    opacity: 1;
+    pointer-events: all;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.context-menu.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.context-menu .context-menu__item {
+    padding: 5px;
+    color: var(--text-color);
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: .2s;
+    justify-content: space-between;
+    border-radius: 5px;
+    padding-right: 8px;
+}
+.context-menu .context-menu__item:hover {
+    cursor: pointer;
+    background: var(--context-border);
+}
+
+.context-menu .context-menu__item .context-menu__item-block {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.context-menu .context-menu__item .context-menu__item-block .shortcut {
+    font-size: 12px;
+    opacity: .5;
+}
+
+.context-menu .context-menu__item span[class^="material-symbols"] {
+    font-size: 15px;
+    font-variation-settings: 'FILL' 0;
+}
+.context-menu .context-menu__item .content {
+    width: fit-content;
+    font-size: small;
+}
+.context-menu .context-menu__item.no-icon {
+    padding-left: 25px;
+}
+
+.context-menu .context-menu__item-divider {
+    width: 100%;
+    height: 1px;
+    display: flex;
+    justify-content: center;
+}
+.context-menu .context-menu__item-divider div {
+    width: 95%;
+    height: 100%;
+    background: var(--context-border);
+}

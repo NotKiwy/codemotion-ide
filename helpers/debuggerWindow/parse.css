@@ -1,0 +1,16 @@
+.parse-boolean, .parse-number {
+    color: #ae6eff;
+}
+.parse-string {
+    color: #ffffff;
+}
+.parse-string {
+    color: #ffffff;
+}
+.parse-null, .parse-undefined {
+    color: gray;
+}
+
+.json {
+    font-size: 14px;
+}

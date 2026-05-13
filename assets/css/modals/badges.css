@@ -1,0 +1,35 @@
+.modal-badge {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    gap: 3px;
+    background: var(--calendar-day-bg);
+    color: var(--default-badge-text);
+    font-weight: 600;
+    width: fit-content;
+    border-radius: 5px;
+    width: 20px;
+    height: 20px;
+    clip-path: path("M8.83374 0.485162C9.4767 -0.161721 10.5233 -0.161721 11.1663 0.485162L12.6406 1.96854C12.9505 2.28031 13.3723 2.45503 13.8119 2.45369L15.9033 2.44732C16.8154 2.44455 17.5555 3.18461 17.5527 4.09666L17.5463 6.1881C17.545 6.62768 17.7197 7.04949 18.0315 7.35937L19.5148 8.83374C20.1617 9.4767 20.1617 10.5233 19.5148 11.1663L18.0315 12.6406C17.7197 12.9505 17.545 13.3723 17.5463 13.8119L17.5527 15.9033C17.5555 16.8154 16.8154 17.5555 15.9033 17.5527L13.8119 17.5463C13.3723 17.545 12.9505 17.7197 12.6406 18.0315L11.1663 19.5148C10.5233 20.1617 9.4767 20.1617 8.83374 19.5148L7.35937 18.0315C7.04949 17.7197 6.62768 17.545 6.1881 17.5463L4.09666 17.5527C3.18461 17.5555 2.44455 16.8154 2.44732 15.9033L2.45369 13.8119C2.45503 13.3723 2.28031 12.9505 1.96854 12.6406L0.485162 11.1663C-0.161721 10.5233 -0.161721 9.4767 0.485162 8.83374L1.96854 7.35937C2.28031 7.04949 2.45503 6.62768 2.45369 6.1881L2.44732 4.09666C2.44455 3.18461 3.18461 2.44455 4.09666 2.44732L6.1881 2.45369C6.62768 2.45503 7.04949 2.28031 7.35937 1.96854L8.83374 0.485162Z");
+    justify-content: center;
+}
+
+.modal-verified__badge {
+    background: #2f77ff47;
+    color: #2f77ff;
+}
+.modal-verified__badge span[class^="material-symbols"] {
+    font-size: 14px;
+    font-variation-settings: 'FILL' 1, 'wght' 700 !important;
+    margin-top: 1px;
+}
+
+.modal-owner__badge {
+    background: #ff2f2f47;
+    color: #ff742f;
+}
+.modal-owner__badge span[class^="material-symbols"] {
+    font-size: 12px;
+    font-variation-settings: 'FILL' 1, 'wght' 700 !important;
+    margin-top: 1px;
+}

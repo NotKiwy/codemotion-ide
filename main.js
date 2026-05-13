@@ -1,0 +1,477 @@
+const { app, BrowserWindow, screen, ipcMain, dialog, shell } = require('electron');
+const path = require('path');
+const fs = require('fs');
+const os = require('os')
+const https = require("https");
+const { spawn } = require("child_process")
+const { GlobalKeyboardListener } = require("node-global-key-listener");
+const v = new GlobalKeyboardListener();
+const http = require("http")
+const WebSocket = require("ws")
+const chokidar = require("chokidar")
+const bus = require("./helpers/eventBus.js")
+
+const { API, verifyToken } = require("./app/auth.js")
+
+const { 
+    SETTINGS_PATH, 
+    LOCAL_BUGS_PATH, 
+    LOCAL_FILE_PATH, 
+    PACKAGE_FILE_PATH,
+    HTML_PATH,
+    JSON_PATH,
+    SPLASH_HTML_PATH,
+    INDEX_HTML_PATH,
+    LOGIN_HTML_PATH,
+    REGISTER_HTML_PATH,
+    ASSETS_PATH,
+    DEFAULT_ICON,
+    PRELOAD_PATH
+} = require("./app/helpers/paths.js")
+
+let mainWindow;
+let workSeconds = 0
+
+require("./app/sandbox/sandbox.js")
+require("./helpers/files.js")
+require("./helpers/getPython.js")
+require("./app/auth.js")
+require("./app/electron/live-server.js")
+require("./app/runtime/runtimeHandler.js")
+require("./app/helpers/terminal.js")
+
+const { createDebuggerWindow } = require("./helpers/debuggerWindow/debuggerWindow.js");
+const { createSplashWindow, updateSplash } = require('./app/splash.js');
+const { 
+    readSettings, 
+    deepMerge,
+    writeLocalBugs,
+    writeSettings,
+    ensureLocalJson,
+    ensureSettingsJson,
+    ensureLocalBugs,
+    getLocalAppData,
+    getSettingsData,
+    getLocalBugsData,
+    getPackageData,
+    getAppIcon,
+    readFilesInFolder,
+    readFileContent,
+    updateLocalAppData,
+    checkStatus
+} = require("./app/helpers/requests.js")
+
+const { 
+    selectFile, 
+    selectFolder,
+    saveFile,
+    readDirTree
+} = require("./app/helpers/os.js");
+
+const { APP_PATH } = require('../Yurba Desktop/app/helpers/paths.js');
+const { checkFields } = require('./app/sandbox/tools.js');
+
+console.log(`App started on ${process.arch} system`)
+
+async function createWindow() {
+    ensureLocalJson();
+    ensureLocalBugs();
+    ensureSettingsJson();
+
+    const localData = getLocalAppData();
+    const settingsData = getSettingsData()
+    const appIcon = await getAppIcon();
+
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width, height } = primaryDisplay.workAreaSize;
+
+    let dev = false
+    let splash = false
+
+    if("app" in settingsData && settingsData.app.splashScreen) {
+        splash = await createSplashWindow()
+    }
+
+	if(process.argv.includes('--d')) dev = true
+
+    mainWindow = new BrowserWindow({
+        width,
+        height,
+        show: false,
+        frame: dev,
+        webPreferences: {
+            preload: path.join(APP_PATH, "preload.js"),
+            contextIsolation: true
+        },
+        icon: appIcon
+    });
+
+    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: 'deny' };
+    });
+    mainWindow.webContents.on('did-finish-load', () => {
+        if(splash) splash.destroy();
+        mainWindow.maximize()
+        mainWindow.show();
+    })
+
+    if(splash) updateSplash("Waiting for connect...")
+
+    checkStatus({ updateSplash: updateSplash })
+        .then(async () => {
+            console.log(true)
+            if (!localData.token) {
+                await mainWindow.loadFile(path.join(HTML_PATH, "login.html"));
+            } else {
+                let userCheckLogin = await verifyToken(localData.token);
+
+                if (userCheckLogin.success) {
+                    await mainWindow.loadFile(path.join(HTML_PATH, "index.html"));
+                    mainWindow.webContents.session.clearCache()
+                }
+                else {
+                    await mainWindow.loadFile(path.join(HTML_PATH, "login.html"));
+                    mainWindow.webContents.send("auth-msg", { type: "error", content: userCheckLogin.result })
+                }
+            }
+
+            v.addListener(function (e, down) {
+                if (e.state == "DOWN" && e.name == "S" && down["LEFT CTRL"]) {
+                    mainWindow.webContents.send("keyboard_action", {
+                        type: "saved"
+                    });
+                }
+            });
+        })
+        .catch(err => {
+            updateSplash(`Error: ${err.message}. Please report this error to the developer and try again later`, true)
+        });
+
+    ipcMain.handle("request-file-open", () => {
+        return selectFile(mainWindow)
+    })
+    ipcMain.handle("request-folder-open", () => {
+        return selectFolder(mainWindow)
+    })
+    ipcMain.on("main-ready", (event) => {
+        bus.emit("main-ready", event.sender);
+    })
+    ipcMain.on("custom-language-registration-ready", (event) => {
+        mainWindow.webContents.send("custom-language-registered")
+    })
+
+    return { mainWindow, splash };
+}
+
+ipcMain.on("close", () => {
+    app.quit();
+});
+
+ipcMain.on("minimize", () => {
+    if (mainWindow) mainWindow.minimize();
+});
+
+ipcMain.on("fullscreen", () => {
+    if (mainWindow) {
+        mainWindow.maximize();
+    }
+});
+
+ipcMain.on("reload", () => {
+    app.relaunch();
+    app.quit(); 
+});
+
+ipcMain.handle('readDirTree', async (_e, rootPath) => {
+    return readDirTree(rootPath);
+});
+
+ipcMain.handle('saveFile', async (event, fullPath, content) => {
+    return await saveFile(fullPath, content);
+});
+
+ipcMain.handle('readFileContent', async (_e, filePath, encoding = 'utf8') => {
+    return readFileContent(filePath, encoding);
+});
+
+ipcMain.handle('getPackageData', async (_e) => {
+    return getPackageData()
+});
+
+ipcMain.handle('getLocalBugsData', async (_e) => {
+    return getLocalBugsData()
+});
+
+
+ipcMain.handle('updateCalendarData', async (_e, data) => {
+    return await saveFile(calendarFilePath, data)
+});
+
+ipcMain.handle("getUserPcInfo", async (event) => {
+    return {
+        platform: process.platform,
+        arch: process.arch,
+        cpus: os.cpus().length,
+        totalMemory: os.totalmem(),
+        freeMemory: os.freemem(),
+        hostname: os.hostname(),
+        homedir: os.homedir()
+    };
+});
+
+ipcMain.on('updateLocalAppData', async (_e, data) => {
+    updateLocalAppData(data)
+});
+
+ipcMain.handle('checkLogin', async (_e, username, password) => {
+    return await checkLogin(username, password)
+});
+
+ipcMain.handle('getAllIcons', () => {
+    return readFilesInFolder("./assets/media/icons");
+});
+
+ipcMain.handle('get-user-data-from-api', async (event) => {
+    let localData = await readFileContent(LOCAL_FILE_PATH)
+    localData = JSON.parse(localData)
+
+    let api = `${API}/getMe.php`
+
+    try {
+        const response = await fetch(api, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localData.token}`
+            }
+        });
+        const result = await response.json();
+
+        if (!response.ok) {
+            return {
+                success: false,
+                result: result
+            }
+        }
+        
+        return {
+            success: true,
+            result: result
+        }
+    } catch (error) {
+        return {
+            success: false,
+            result: error.message,
+        }
+    }
+})
+ipcMain.handle('getOrgDataFromAPI', async (event, orgID) => {
+    let api = `${API}/getOrg.php?id=${orgID}`
+
+    try {
+        const response = await fetch(api);
+        const result = await response.json();
+
+        if (!response.ok) {
+            return {
+                success: false,
+                result: result
+            }
+        }
+        
+        return {
+            success: true,
+            result: result
+        }
+    } catch (error) {
+        return {
+            success: false,
+            result: error.message,
+        }
+    }
+})
+ipcMain.handle("set-settings", (event, data) => {
+    if (!data || typeof data !== "object") {
+        return readSettings();
+    }
+    return writeSettings(data);
+});
+ipcMain.handle("open-in-browser", (event, url) => {
+    shell.openExternal(url);
+});
+ipcMain.handle("get-app-icons", async () => {
+    try {
+        const dir = path.join(ASSETS_PATH, "media", "app-icons")
+        const files = await fs.promises.readdir(dir)
+        const result = []
+
+        for (const file of files) {
+            const fullPath = path.join(dir, file)
+            const stat = await fs.promises.stat(fullPath)
+
+            if (stat.isFile()) {
+                result.push(file)
+            }
+        }
+
+        return result
+    } catch (err) {
+        console.error("get-app-icons error:", err)
+        return []
+    }
+})
+ipcMain.handle("get-app-local", async () => {
+    return await getLocalAppData()
+})
+
+ipcMain.handle("read-settings", () => {
+    return readSettings();
+});
+
+ipcMain.handle("read-comments", () => {
+    return readComments();
+});
+
+ipcMain.handle("get-app-icon", async () => {
+    return await getAppIcon()
+})
+
+ipcMain.handle("create-debugger-window", async (event) => {
+    createDebuggerWindow(mainWindow)
+    return true
+})
+
+ipcMain.handle("get-dirname", async (event) => {
+    return __dirname
+})
+
+ipcMain.handle("remove-by-path", async (event, targetPath) => {
+    try {
+        if (!targetPath || typeof targetPath !== "string") {
+            throw new Error("Invalid path")
+        }
+
+        const resolvedPath = path.resolve(targetPath)
+
+        if (!fs.existsSync(resolvedPath)) {
+            return { success: false, error: "Path does not exist" }
+        }
+
+        const stat = fs.lstatSync(resolvedPath)
+
+        if (stat.isDirectory()) {
+            fs.rmSync(resolvedPath, { recursive: true, force: true })
+        } else {
+            fs.unlinkSync(resolvedPath)
+        }
+
+        return { success: true }
+    } catch (err) {
+        return { success: false, error: err.message }
+    }
+})
+
+ipcMain.handle("modify-local-bugs", async (_, { type, data }) => {
+    try {
+        let bugs = readBugs()
+
+        switch (type) {
+            case "add": {
+                bugs.push(data)
+                writeBugs(bugs)
+                return { success: true }
+            }
+
+            case "edit": {
+                if (typeof data?.id === "undefined") {
+                    return { success: false, error: "Missing data.id" }
+                }
+
+                const index = bugs.findIndex(bug => bug.id === data.id)
+
+                if (index === -1) {
+                    return { success: false, error: "Bug not found" }
+                }
+
+                bugs[index] = data
+
+                writeBugs(bugs)
+                return { success: true }
+            }
+
+            case "set": {
+                if (!Array.isArray(data)) {
+                    return { success: false, error: "Data must be an array" }
+                }
+
+                writeBugs(data)
+                return { success: true }
+            }
+
+            default:
+                return { success: false, error: "Unknown type" }
+        }
+
+    } catch (e) {
+        console.error("Handler error:", e)
+        return { success: false, error: e.message }
+    }
+})
+
+ipcMain.handle('ask-to-save-content', async (event, filename, content) => {
+    try {
+        const result = await dialog.showSaveDialog({
+            title: 'Save a new file',
+            defaultPath: filename,
+            buttonLabel: 'Save',
+            properties: ['createDirectory']
+        });
+
+        if (result.canceled || !result.filePath) {
+            return { success: false, canceled: true };
+        }
+
+        await fs.promises.writeFile(result.filePath, content, 'utf-8');
+
+        return {
+            success: true,
+            path: result.filePath
+        };
+
+    } catch (err) {
+        console.error('Save error:', err);
+
+        return {
+            success: false,
+            error: err.message
+        };
+    }
+});
+
+ipcMain.handle("get-platform", (e) => {
+    return process.platform
+})
+
+app.whenReady().then(createWindow);
+
+setInterval(() => {
+    workSeconds += 0.1
+}, 100)
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit();
+
+    const settings = readSettings()
+
+    if("app" in settings) {
+        if("workSeconds" in settings.app) {
+            let seconds = settings.app.workSeconds
+            writeSettings({ app: { workSeconds: Math.round((workSeconds + seconds) * 10) / 10 }})
+        }
+        if("workSecondsSession" in settings.app) {
+            writeSettings({ app: { workSecondsSession: Math.round(workSeconds * 10) / 10 }})
+        }
+    }
+
+    console.log(`Worked: ${workSeconds}s`)
+});

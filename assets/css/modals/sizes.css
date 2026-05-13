@@ -1,0 +1,27 @@
+.modal-wrapper .modal,
+.modal-wrapper .modal.lg {
+    width: 90%;
+    height: 80%;
+}
+.modal-wrapper .modal.md {
+    width: 70%!important;
+    min-height: 60%!important;
+    height: fit-content!important;
+}
+.modal-wrapper .modal.sm {
+    width: 50%!important;
+    min-height: 40%!important;
+    height: fit-content!important;
+}
+.modal-wrapper .modal.mini {
+    width: 400px!important;
+    min-height: 150px!important;
+    height: fit-content!important;
+}
+.modal-wrapper .modal.mini .modal-body {
+    padding: 10px!important;
+}
+.modal-wrapper .modal.full {
+    width: 80%;
+    height: fit-content;
+}

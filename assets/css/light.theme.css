@@ -1,0 +1,50 @@
+body[theme="light"] {
+    --body-color: #ffffff;
+    --body-color-solid: #ffffff;
+    --body-color-transparent: #ffffffa6;
+    --topbar-color: #efefef;
+    --block-divider-border-color: #e1e1e1;
+    --text-color: #000000;
+    --text-color-muted: #c1c1c1;
+    --topbar-menu-item-hover-bg: #000000;
+    --explorer-padding: 0px 15px;
+    --switch-bg-default: #ffffff;
+    --switch-bg-active: #ffffff;
+    --switch-inner-default: #fff;
+    --switch-inner-active: #ffffff;
+    --explorer-tabs-bg: linear-gradient(0deg, #ffffff00, #ffffff14);
+    --explorer-tabs-border: radial-gradient(#ffffff4a, transparent);
+    --explorer-tabs-color: white;
+    --default-badge-bg: #e5903624;
+    --default-badge-text: #e59036;
+    --segment-bg: #ffffff;
+    --segment-label: #f1f1f1;
+    --segment-divider: #ffffff1a;
+    --danger: #ff4949;
+    --warning: #e59036;
+    
+    --code-footer-bg: #ffffffcf;
+    --notificator-body-bg: #ffffffb5;
+    --notificator-body-border: #e9e9e9;
+    --switch-checkbox-active: #000000;
+    --switch-checkbox: #d1d1d1;
+    --link-color: #4165f1;
+
+    --color-function: #ff641d;
+    --color-class: #218f6b;
+    --color-number: #3c4fff;
+    --color-boolean: #7205ff;
+    --color-string: #b57026;
+    --color-keyword: #8d36c1;
+}
+
+body[theme="light"] .code-tab.not-saved::after {
+    background: #388ae1;
+    border: 2px solid #ffffff;
+}
+body[theme="light"] .explorer-elements .file::after {
+    background: linear-gradient(270deg, var(--topbar-color) 20%, transparent);
+}
+body[theme="light"] .explorer-elements .file.active {
+    background: #00000012;
+}

@@ -1,0 +1,149 @@
+@import url("parse.css");
+
+html {
+    height: 100vh;
+}
+body {
+    margin: 0;
+    padding: 20px;
+    height: -webkit-fill-available;
+    background: rgba(15, 15, 15);
+    color: white;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 15px;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #0f0f0f;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #212121;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+}
+
+.transparent {
+    opacity: .5;
+}
+
+.marking::after {
+    content: "----------------------";
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.debug-item {
+    display: flex;
+    gap: 10px;
+}
+.debug-item div:nth-child(3) {
+    overflow: scroll;
+    word-wrap: break-word;
+}
+.debug-item div:nth-child(3)::-webkit-scrollbar {
+    display: none;
+}
+.debug-item .emoji {
+    width: 15px;
+    vertical-align: -0.15em;
+}
+.debug-item div {
+    white-space: break-spaces;
+}
+.debug-item.error {
+    color: rgb(255, 43, 43);
+}
+.debug-item.warn {
+    color: rgb(255, 181, 43);
+}
+.debug-item.foreign {
+    background: #1a1a1a;
+    border-radius: 5px;
+    padding: 5px;
+}
+.debug-item .from {
+    color: #3da4ff;
+}
+
+important {
+   color: #3da4ff;
+   font-weight: 700; 
+}
+
+.commands {
+    width: -webkit-fill-available;
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    padding: 0px 20px;
+}
+.commands input {
+    background: #252525cc;
+    backdrop-filter: blur(10px);
+    border: 1px solid #ffffff0a;
+    font-family: inherit;
+    padding: 10px;
+    width: -webkit-fill-available;
+    border-radius: 10px;
+    outline: none;
+    color: white;
+}
+
+.commands .commands-suggest {
+    background: #1a1a1ae0;
+    backdrop-filter: blur(10px);
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 10px;
+    border: 1px solid #ffffff0f;
+    font-size: 12px;
+    display: flex;
+    gap: 5px;
+    transition: .2s;
+    overflow: hidden;
+    overflow-x: auto;
+}
+.commands .commands-suggest::-webkit-scrollbar {
+    display: none;
+}
+.commands .commands-suggest.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.commands .commands-suggest .commands-suggest__item {
+    padding: 5px 8px;
+    width: fit-content;
+    border-radius: 5px;
+    transition: .2s;
+    white-space: nowrap;
+}
+.commands .commands-suggest .commands-suggest__item:hover {
+    background: #ffffff0a;
+    cursor: pointer;
+}
+
+code {
+    background: #222222;
+    border-radius: 5px;
+    transition: .2s;
+}
+code:hover {
+    cursor: pointer;
+    opacity: .5;
+}
+
+#main {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-bottom: 80px;
+}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="index.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
+    
+    <title>Debugger</title>
+</head>
+<body>
+    <div id="main">
+        <b>CodeMotion Debugger Window</b>
+        <span class="transparent">Here, you can run pre-configured commands and view the logs for the app and extensions</span>
+    
+        <div class="marking"></div>
+    </div>
+    <div class="commands">
+        <div class="commands-suggest hidden"></div>
+        <input type="text" placeholder="Type commands here..." id="command">
+    </div>
+</body>
+</html>
+<script src="index.js" type="module"></script>

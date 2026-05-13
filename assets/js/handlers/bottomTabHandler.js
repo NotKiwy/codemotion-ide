@@ -1,0 +1,137 @@
+import { Languages } from "../lib.js";
+import { TopWindowList, destroyAllTopWindowLists } from "../topWindowHandler/topWindowList.js";
+
+export function setCurrentLanguage(langName, properties = {}) {
+    destroyAllTopWindowLists()
+
+    if(!properties.editor) throw new Error(`Second argument "properties" must include { editor: Editor }`)
+
+    const aviableLanguageNames = []
+
+    Object.values(Languages.list()).map(lang => {
+        const notIncluded = ["Image", "Font", "To-Do List", "GIT File"]
+        if(!(notIncluded.includes(lang.name))) {
+            return { name: lang.name, id: lang.mode }
+        }
+    })
+    .filter(item => item != undefined)
+    .map(item => {
+        return aviableLanguageNames.push({ name: item.name, id: item.id })
+    });
+
+    const changeLanguageList = new TopWindowList("changeLanguage", aviableLanguageNames)
+    changeLanguageList.on("click", (data) => {
+        document.querySelectorAll("#currentLang").forEach(e => {
+            if (e) {
+                properties.editor.session.setMode(`ace/mode/${data.id}`);
+                e.textContent = data.name
+            }
+        })
+    })
+    changeLanguageList.bind(document.querySelector("#currentLang"))
+
+    document.querySelectorAll("#currentLang").forEach(e => {
+        if (e) {
+            e.textContent = langName
+        }
+    })
+}
+
+export function setColumn(col) {
+    document.querySelectorAll("#currentCol").forEach(e => {
+        if (e) {
+            e.textContent = col
+        }
+    })
+}
+
+export function setTabSize(size) {
+    document.querySelectorAll("#currentTabSize").forEach(e => {
+        if (e) {
+            e.textContent = size
+        }
+    })
+
+    window.electron.setSettings({ editor: { tabSize: size } })
+}
+
+export function setSymbols(len) {
+    document.querySelectorAll("#currentSymbols").forEach(e => {
+        if (e) {
+            e.textContent = len
+        }
+    })
+}
+
+export function setErrors(object) {
+    let errorObject = {}
+    let warningObject = {}
+
+    for (let e in object) {
+        if (object[e].type == "error") {
+            errorObject[e] = object[e]
+        }
+        if (object[e].type == "warning") {
+            warningObject[e] = object[e]
+        }
+    }
+
+    document.querySelectorAll("#errorCount").forEach(e => {
+        if (e) {
+            let len = Object.keys(errorObject).length
+
+            e.parentElement.classList.toggle("text-danger", len > 0)
+            e.textContent = Object.keys(errorObject).length
+        }
+    })
+    document.querySelectorAll("#warningCount").forEach(e => {
+        if (e) {
+            let len = Object.keys(warningObject).length
+
+            e.parentElement.classList.toggle("text-warning", len > 0)
+            e.textContent = Object.keys(warningObject).length
+        }
+    })
+}
+
+export function toggleCodeFooter(bool) {
+    if (bool) {
+        document.querySelectorAll(".code-footer").forEach(e => {
+            e.classList.remove("hidden")
+        })
+    }
+    else {
+        document.querySelectorAll(".code-footer").forEach(e => {
+            e.classList.add("hidden")
+        })
+    }
+}
+
+export function setLine(line) {
+    document.querySelectorAll("#currentLine").forEach(e => {
+        if (e) {
+            e.textContent = line
+        }
+    })
+}
+
+const runtimeErrors = document.querySelector("#runtimeErrors")
+const bottomWarnings = document.querySelector("#bottomWarnings")
+const bottomErrors = document.querySelector("#bottomErrors")
+
+export function disableErrors(editor) {
+    bottomErrors.classList.add("hidden")
+    bottomWarnings.classList.add("hidden")
+
+    runtimeErrors.classList.add("disabled")
+
+    editor.session.setOption("useWorker", false);
+}
+export function enableErrors(editor) {
+    bottomErrors.classList.remove("hidden")
+    bottomWarnings.classList.remove("hidden")
+
+    runtimeErrors.classList.remove("disabled")
+
+    editor.session.setOption("useWorker", true);
+}

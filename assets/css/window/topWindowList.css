@@ -1,0 +1,22 @@
+@import url("global.css");
+
+.top-window.list {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.top-window.list .top-window__list-item {
+    color: var(--text-color);
+    opacity: .5;
+    background: transparent;
+    border-radius: 5px;
+    padding: 3px 5px;
+    font-size: 14px;
+    transition: .2s;
+}
+.top-window.list .top-window__list-item:hover {
+    opacity: 1;
+    background: var(--block-divider-border-color);
+    cursor: pointer;
+}

@@ -1,0 +1,21 @@
+.top-window {
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    backdrop-filter: blur(20px);
+    background: var(--context-body);
+    border: 1px solid var(--block-divider-border-color);
+    z-index: 9999;
+    width: 300px;
+    min-height: 100px;
+    border-radius: 10px;
+
+    opacity: 1;
+    pointer-events: all;
+    transition: .2s;
+}
+.top-window.hidden {
+    opacity: 0;
+    pointer-events: none;
+}

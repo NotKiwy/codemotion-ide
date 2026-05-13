@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/main.css"> 
+    <link rel="stylesheet" href="../assets/css/global.css"> 
+    <link rel="stylesheet" href="../assets/css/light.theme.css"> 
+    <link rel="stylesheet" href="../assets/css/contrast-dark.theme.css">
+
+    <link rel="shortcut icon" href="../assets/media/codemotion-logo.png" type="image/x-icon">
+
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self' 'unsafe-eval' 'unsafe-inline' https://unpkg.com file: data: blob:;
+        script-src 'self' 'unsafe-eval' 'unsafe-inline'
+            https://unpkg.com 
+            https://cdnjs.cloudflare.com 
+            https://cdnjs.com
+            https://cdn.yurba.one 
+            https://cdn.jsdelivr.net
+            https://speedcf.cloudflareaccess.com
+            https://www.unpkg.com
+            https://html2canvas.hertzen.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+        font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data:;
+        worker-src 'self' blob:;
+        img-src 'self' data: blob: https://twemoji.maxcdn.com https://cdn.jsdelivr.net;
+    ">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <script src="../ace/src-noconflict/ace.js"></script>
+    <script src="../ace/plugins/ext-language_tools.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto/ring.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/JDMcKinstry/JavaScriptDateFormat@master/Date.format.min.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ldrs/dist/auto/lineSpinner.js"></script>
+    <script src="https://unpkg.com/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="../assets/plugins/acorn/acorn.min.js"></script>
+
+    <link rel="stylesheet" href="../node_modules/@xterm/xterm/css/xterm.css" />
+    <script src="../node_modules/@xterm/xterm/lib/xterm.js"></script>
+    <script src="../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    
+    <title>CodeMotion</title>
+</head>
+<body>
+    <div class="notificator-wrapper hidden">
+        <div class="notificator">
+            <span class="material-symbols-rounded" id="notificator_icon">search</span>
+
+            <div class="notificator-body">
+                <p class="notificator-body__value" id="notificator_value">100%</p>
+            </div>
+        </div>
+    </div>
+    <div class="loader">
+        <l-line-spinner
+            size="40"
+            stroke="3"
+            speed="1"
+            color="white" 
+        ></l-line-spinner>
+        <p class="loader-msg hidden">...</p>
+    </div>
+    <div class="modal-wrapper hidden" id="orgs">
+        <div class="modal window">
+            <div class="modal-header">
+                <p class="modal-header__title">Your organizations</p>
+                <div class="modal-header__close">
+                    <span class="material-symbols-rounded">close</span>
+                </div>
+            </div>
+            <div class="modal-body orgs"></div>
+        </div>
+    </div>
+    <div class="modal-wrapper hidden" id="commentAdd">
+        <div class="modal window mini">
+            <div class="modal-header">
+                <p class="modal-header__title">Add comment</p>
+                <div class="modal-header__close">
+                    <span class="material-symbols-rounded">close</span>
+                </div>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+    <div class="modal-wrapper hidden" id="commentEdit">
+        <div class="modal window mini">
+            <div class="modal-header">
+                <p class="modal-header__title">Edit comment</p>
+                <div class="modal-header__close">
+                    <span class="material-symbols-rounded">close</span>
+                </div>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+    <div class="modal-wrapper hidden" id="commentsAll">
+        <div class="modal window sm">
+            <div class="modal-header">
+                <p class="modal-header__title">Comments</p>
+                <div class="modal-header__close">
+                    <span class="material-symbols-rounded">close</span>
+                </div>
+            </div>
+            <div class="modal-body comments"></div>
+        </div>
+    </div>
+    <div class="modal-wrapper hidden">
+        <div class="modal window sm">
+            <div class="modal-header">
+                <p class="modal-header__title">Installed extensions</p>
+                <div class="modal-header__close">
+                    <span class="material-symbols-rounded">close</span>
+                </div>
+            </div>
+            <div class="modal-body extensions"></div>
+        </div>
+    </div>
+    <div class="modal-wrapper hidden" id="logout">
+        <div class="modal window confirm">
+            <div class="modal-header">
+                <p class="modal-header__title">Logout</p>
+                <div class="modal-header__close">
+                    <span class="material-symbols-rounded">close</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="confirm-title">Are you sure?</div>
+                <div class="confirm-desc">That action cannot be undone</div>
+
+                <div class="confirm-buttons">
+                    <button modal-close>Cancel</button>
+                    <button action="logout" class="danger">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-wrapper hidden" id="addBug">
+        <div class="modal window sm">
+            <div class="modal-header">
+                <p class="modal-header__title">Add bug</p>
+                <div class="modal-header__close">
+                    <span class="material-symbols-rounded">close</span>
+                </div>
+            </div>
+            <div class="modal-body">LOL</div>
+        </div>
+    </div>
+    <div class="topbar">
+        <div class="topbar-section">
+            <div class="topbar-section__item">
+                <img class="topbar-section__item-logo blurred" src="../assets/media/codemotion_header_icon.png">
+                <img class="topbar-section__item-logo" src="../assets/media/codemotion_header_icon.png">
+            </div>
+			<div class="popups-wrapper">
+				<div class="popup" popup="file">
+					<div class="popup-title">File</div>
+
+					<div class="popup-content hidden">
+						<div class="popup-content__item">Create new file</div>
+						<div class="popup-content__item">Open file</div>
+						<div class="popup-content__item" id="export_to_txt">Export .txt</div>
+						<div class="popup-content__item" modal="convertToPDF">Export .pdf</div>
+						<div class="popup-content__divider"></div>
+						<div class="popup-content__item" modal="exit">Exit</div>
+					</div>
+				</div>
+				<div class="popup" popup="file">
+					<div class="popup-title">Tools</div>
+
+					<div class="popup-content hidden">
+						<div class="popup-content__item" id="appearance_n">Appearance</div>
+					</div>
+				</div>
+				<div class="popup" popup="actions">
+					<div class="popup-title">Actions</div>
+
+					<div class="popup-content hidden">
+                        <div class="popup-content__item" action="appreload">Reload application</div>
+                        <div class="popup-content__item" action="appminimize">Minimize application</div>
+                        <div class="popup-content__item" action="appmaximize">Maximize application</div>
+                        <div class="popup-content__divider"></div>
+						<div class="popup-content__item" action="appclose">Close application</div>
+					</div>
+				</div>
+				<div class="popup" popup="file">
+					<div class="popup-title" id="username"></div>
+
+					<div class="popup-content hidden">
+						<div class="popup-content__item" id="extensionsAll">Installed extensions</div>
+                        <div class="popup-content__item" id="yourOrganizations">Your organizations</div>
+                        <div class="popup-content__divider"></div>
+                        <div class="popup-content__item danger" modal="logout">Logout</div>
+					</div>
+				</div>
+            </div>
+        </div>
+        <div class="topbar-section" id="topbarCenter">
+            <div class="topbar-center transparent">
+                <div id="userAvatar"></div>
+            </div>
+            <div class="topbar-center">
+                <div class="topbar-center__row">
+                    <span id="username" class="bold"></span>
+                    <span id="current_hours" class="translucent"></span>
+                </div>
+            </div>
+            <div class="topbar-center">
+                <div class="topbar-center__row">
+                    <span class="material-symbols-rounded outline">bug_report</span>
+                    <span id="bug_counter"></span>
+                </div>
+            </div>
+            <div class="status-indicator hidden"></div>
+        </div>
+        <div class="topbar-section actions">
+            <div class="topbar-action" action="appminimize">–</div>
+            <div class="topbar-action" action="appmaximize">▢</div>
+            <div class="topbar-action" action="appclose">✕</div>
+        </div>
+    </div>
+    <div class="main-wrapper">
+        <div class="sidebar">
+            <div class="sidebar-item" id="files" default tooltip="Explorer">
+                <span class="material-symbols-rounded outline">folder_open</span>
+            </div>
+            <div class="sidebar-item" id="history" tooltip="History">
+                <span class="material-symbols-rounded outline">history</span>
+            </div>
+            <div class="sidebar-item" id="bugs" tooltip="Bugs">
+                <span class="material-symbols-rounded outline">bug_report</span>
+            </div>
+            <div class="sidebar-item hidden" id="runtimeOutputPython" nondefault visibleOn="language:py" tooltip="Python Emulator">
+                <span class="material-symbols-rounded outline">play_circle</span>
+            </div>
+            <div class="sidebar-item hidden" id="MDPreview" nondefault visibleOn="mode:markdown" tooltip="Preview">
+                <span class="material-symbols-rounded outline">preview</span>
+            </div>
+            <div class="sidebar-item hidden" id="startLiveServer" nondefault visibleOn="language:html" tooltip="Live server">
+                <span class="material-symbols-rounded outline">sensors</span>
+            </div>
+            <div class="sidebar-item bottom" id="runtimeErrors" nondefault tooltip="Errors">
+                <span class="badge hidden">0</span>
+                <span class="material-symbols-rounded outline">build</span>
+            </div>
+        </div>
+        <div class="explorer">
+            <div class="explorer-title">
+                <div class="explorer-title__name">
+                    <span id="tab-name"></span>
+                </div>
+                <div class="explorer-title__actions">
+                    <span class="material-symbols-rounded bounce-on-hover outline" id="open_folder" visibleOn="tab:files">folder_open</span>
+                    <span class="material-symbols-rounded bounce-on-hover outline" id="create_file" visibleOn="tab:files">add</span>
+                    <span class="material-symbols-rounded bounce-on-hover outline" id="add_local_bug" visibleOn="tab:bugs" id="addBug">add</span>
+                </div>
+            </div>
+            <div class="explorer-elements" data-tab="files">
+                <div class="explorer-elements__files-empty">
+                    Click to the <span class="material-symbols-rounded outline">folder_open</span> to open folder here
+                </div>
+            </div>
+            <div class="explorer-elements" data-tab="history">
+                <div class="elements"></div>
+            </div>
+            <div class="explorer-elements" data-tab="noUSE">
+                <div class="settings-buttons__wrapper">
+                    <div class="settings-button" id="run-debugger">
+                        <ion-icon name="play-circle-outline" id="run-debug"></ion-icon>
+                    </div>
+                </div>
+                <div class="settings-col list">
+                    <p class="settings-col__title">Console</p>
+                    <div class="settings-col__cols"></div>
+                </div>
+            </div>
+            <div class="explorer-elements" data-tab="bugs">
+                <div class="segmented-picker">
+                    <input id="bugs-all" type="radio" name="picker" checked />
+                    <label for="bugs-all"><span>All</span></label>
+
+                    <input id="bugs-own" type="radio" name="picker" />
+                    <label for="bugs-own"><span>Local</span></label>
+
+                    <input id="bugs-done" type="radio" name="picker" />
+                    <label for="bugs-done"><span>Done</span></label>
+                </div>
+
+                <div class="elements"></div>
+            </div>
+        </div>
+        <div class="code-wrapper">
+            <div class="bottom-window__container"></div>
+            <div class="code-tabs hidden"></div>
+            <div class="code-inner__wrapper">
+                <div class="code" id="main-code">
+                    <div class="code-start">
+                        <div class="code-start__main">
+                            <img class="code-start__main-logo">
+                            <h1 class="monospace">$cdmtn<span class="cursor-animation">_</span></h1>
+                            <p>How do you feel today, <span id="username"></span>?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="code-structure">
+                <span>No context</span>
+            </div>
+            <div class="code-footer hidden">
+                <div class="code-footer__section">
+                    <span id="currentLang">Javascript</span>
+                    <span class="code-footer__section-btn" id="code-snippet" tooltip="Code snippet" tooltippos="top"> 
+                        <span class="material-symbols-rounded">camera</span>
+                    </span>
+                    <span class="code-footer__section-btn" id="code-copy" tooltip="Copy" tooltippos="top">
+                        <span class="material-symbols-rounded">content_copy</span>
+                    </span>
+                    <span class="code-footer__section-btn" id="code-console" tooltip="Terminal" tooltippos="top">
+                        <span class="material-symbols-rounded">terminal_2</span>
+                    </span>
+                    <span class="code-footer__section-btn" id="js-minify" visibleOn="language:javascript" tooltip="JavaScript Minify" tooltippos="top">
+                        <span class="material-symbols-rounded">compress</span>
+                    </span>
+                    <span class="code-footer__section-btn" id="css-minify" visibleOn="language:css" tooltip="CSS Minify" tooltippos="top">
+                        <span class="material-symbols-rounded">compress</span>
+                    </span>
+                    <span class="code-footer__section-btn row hidden" id="incontext-loading">
+                        <l-ring
+                            size="10"
+                            stroke="1"
+                            bg-opacity="0"
+                            speed="3"
+                        ></l-ring>
+                        <span id="incontext-loading-text"></span>
+                    </span>
+                </div>
+                <div class="code-footer__section">
+                    <span class="code-footer__section-btn" id="changeTabSize">Tab size: <span id="currentTabSize">0</span></span>
+                    <span><span id="currentSymbols">0</span> Symb.</span>
+                    <span><span id="currentCol">0</span> Col</span>
+                    <span>Line <span id="currentLine">0</span></span>
+                    <span class="text-danger text-in-line" id="bottomErrors">
+                        <span class="material-symbols-rounded">cancel</span>
+                        <span id="errorCount">0</span>
+                    </span>
+                    <span class="text-warning text-in-line" id="bottomWarnings">
+                        <span class="material-symbols-rounded">error</span>
+                        <span id="warningCount">0</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script type="module" src="../app/renderer.js"></script>

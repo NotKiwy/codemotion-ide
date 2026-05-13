@@ -1,0 +1,276 @@
+const { ipcMain, app } = require('electron');
+const fs = require('fs');
+const path = require('path');
+const { LOCAL_FILE_PATH } = require("./helpers/paths.js")
+
+const tokenFile = LOCAL_FILE_PATH
+const API = 'https://dev.yurba.one/api/pcode';
+
+async function register(username, password, passwordConfirm) {
+    try {
+        const response = await fetch(`${API}/register.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username,
+                password,
+                passwordConfirm
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            return {
+                success: false,
+                result: result.result || 'Registration failed'
+            };
+        }
+
+        return {
+            success: true,
+            result: result.result
+        };
+    } catch (error) {
+        return {
+            success: false,
+            result: error.message
+        };
+    }
+}
+
+async function login(username, password) {
+    try {
+        const response = await fetch(`${API}/checkLogin.php`, {
+            method: 'POST', // ⭐ Изменили с GET на POST!
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username,
+                password
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            return {
+                success: false,
+                result: result.result || 'Login failed'
+            };
+        }
+
+        return {
+            success: true,
+            result: result.result
+        };
+    } catch (error) {
+        return {
+            success: false,
+            result: error.message
+        };
+    }
+}
+
+async function loginById(id, password) {
+    try {
+        const response = await fetch(`${API}/checkLogin.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id,
+                password
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            return {
+                success: false,
+                result: result.result || 'Login failed'
+            };
+        }
+
+        return {
+            success: true,
+            result: result.result
+        };
+    } catch (error) {
+        return {
+            success: false,
+            result: error.message
+        };
+    }
+}
+
+async function verifyToken(token) {
+    try {
+        const response = await fetch(`${API}/verifyToken.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        const result = await response.json();
+
+        return {
+            success: response.ok,
+            result: result.result
+        };
+    } catch (error) {
+        return {
+            success: false,
+            result: error.message
+        };
+    }
+}
+
+function saveToken(tokenData) {
+    try {
+        fs.writeFileSync(tokenFile, JSON.stringify(tokenData, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Error saving token:', error);
+        return false;
+    }
+}
+
+function loadToken() {
+    try {
+        if (fs.existsSync(tokenFile)) {
+            const data = fs.readFileSync(tokenFile, 'utf-8');
+            return JSON.parse(data);
+        }
+        return null;
+    } catch (error) {
+        console.error('Error loading token:', error);
+        return null;
+    }
+}
+
+function deleteToken() {
+    try {
+        if (fs.existsSync(tokenFile)) {
+            fs.unlinkSync(tokenFile);
+        }
+        return true;
+    } catch (error) {
+        console.error('Error deleting token:', error);
+        return false;
+    }
+}
+
+function decodeJWT(token) {
+    try {
+        const parts = token.split('.');
+        if (parts.length !== 3) return null;
+
+        const payload = JSON.parse(
+            Buffer.from(parts[1], 'base64').toString('utf-8')
+        );
+
+        if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+            return null;
+        }
+
+        return payload;
+    } catch (error) {
+        console.error('Error decoding JWT:', error);
+        return null;
+    }
+}
+
+ipcMain.handle('register', async (_e, username, password, passwordConfirm) => {
+    return await register(username, password, passwordConfirm);
+});
+
+ipcMain.handle('login', async (_e, username, password) => {
+    const result = await login(username, password);
+
+    if (result.success && result.result.token) {
+        saveToken({
+            token: result.result.token,
+            user: result.result.user,
+            expiresIn: result.result.expiresIn,
+            savedAt: new Date().toISOString()
+        });
+    }
+
+    return result;
+});
+
+ipcMain.handle('login-by-id', async (_e, id, password) => {
+    const result = await loginById(id, password);
+
+    if (result.success && result.result.token) {
+        saveToken({
+            token: result.result.token,
+            user: result.result.user,
+            expiresIn: result.result.expiresIn,
+            savedAt: new Date().toISOString()
+        });
+    }
+
+    return result;
+});
+
+ipcMain.handle('logout', async () => {
+    deleteToken();
+    return {
+        success: true,
+        result: 'Logged out successfully'
+    };
+});
+
+ipcMain.handle('get-token', async () => {
+    const tokenData = loadToken();
+
+    if (!tokenData) {
+        return {
+            success: false,
+            result: null
+        };
+    }
+
+    const decoded = decodeJWT(tokenData.token);
+
+    if (!decoded) {
+        deleteToken();
+        return {
+            success: false,
+            result: null
+        };
+    }
+
+    return {
+        success: true,
+        result: tokenData
+    };
+});
+
+ipcMain.handle('is-logged-in', async () => {
+    const tokenData = loadToken();
+
+    if (!tokenData) {
+        return false;
+    }
+
+    const decoded = decodeJWT(tokenData.token);
+
+    if (!decoded) {
+        deleteToken();
+        return false;
+    }
+
+    return true;
+});
+
+module.exports = { API, login, verifyToken }

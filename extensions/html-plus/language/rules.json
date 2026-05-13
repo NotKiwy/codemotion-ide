@@ -1,0 +1,10 @@
+{
+    "errors": true,
+    "syntax": {},
+    "mode": "html",
+
+    "autocomplete": {
+        "auto": true,
+        "keywords": []
+    }
+}
