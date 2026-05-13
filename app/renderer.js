@@ -32,6 +32,7 @@ import { getDirname, readSettings } from "../assets/js/global.js"
 import { closeAllTabs } from "../assets/components/tabHandler.js"
 
 import { handleSettings } from "../assets/js/settings.js"
+import { SidebarResizeHandler } from "../assets/js/handlers/SidebarResizeHandler.js"
 
 import { buildTreeHtml, renderNodes } from "../assets/js/explorerTree/render.js"
 import { openFolder } from "../assets/js/explorerTree/handlers/openFolderHandler.js"
@@ -118,7 +119,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     document.body.addEventListener("wheel", () => { handleOnWheelScrollX() })
 
-    const settings = await window.electron.readSettings()
+    const settings = userSettings
     const appIcon = await window.electron.getAppIcon()
 
     const pathContext = {}
@@ -129,7 +130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const SEGMENTED_CONTROL_INDIVIDUAL_SEGMENT_SELECTOR = ".segmented-control .option input";
     const SEGMENTED_CONTROL_BACKGROUND_PILL_SELECTOR = ".segmented-control .selection";
 
-    document.addEventListener("DOMContentLoaded", setup);
+    setup()
 
     function setup() {
         forEachElement(SEGMENTED_CONTROL_BASE_SELECTOR, (elem) => {
@@ -175,6 +176,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const loader = document.querySelector(".loader");
     const mainWrapper = document.querySelector(".main-wrapper");
     const topbar = document.querySelector(".topbar");
+    const explorer = document.querySelector(".explorer");
     const filesPanel = document.querySelector('.explorer-elements[data-tab="files"]');
     // Main
     setUserPcInfo();
@@ -313,6 +315,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (topbar && mainWrapper) {
         mainWrapper.style.cssText = `height: calc(100% - ${topbar.offsetHeight + 5}px)`;
     }
+
+    new SidebarResizeHandler({
+        explorer,
+        mainWrapper,
+        settings,
+        onResizeEnd: () => {
+            tabsByPath.forEach((tab) => tab.editor?.resize?.())
+        }
+    })
 
     // open folder btn
 

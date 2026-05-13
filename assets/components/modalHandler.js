@@ -1,6 +1,7 @@
 import { handleSettings, Setting } from "../js/settings.js"
 import { Options } from "../js/lib.js"
 import { optionsThemeButtonHandler } from "../js/handlers/themesHandler.js"
+import { showBackdrop, hideBackdrop } from "../js/modalsHandler/engine.js"
 
 const modalAppendingAfterEl = document.querySelector(".topbar")
 
@@ -13,12 +14,6 @@ export const modalOwnerBadgeHTML =
         <span class="material-symbols-rounded">crown</span>
     </span>`
 
-function showBackdrop() {
-    
-}
-function hideBackdrop() {
-    
-}
 function capitalizeFirst(str) {
     if (!str) return str;
     return str[0].toUpperCase() + str.slice(1);
@@ -26,6 +21,12 @@ function capitalizeFirst(str) {
 
 document.querySelectorAll(".modal-wrapper").forEach(modal => {
     modal.querySelector(".modal-header__close").addEventListener("click", () => {
+        modal.classList.add("hidden")
+        hideBackdrop()
+    })
+    modal.addEventListener("click", (event) => {
+        if (event.target !== modal) return
+
         modal.classList.add("hidden")
         hideBackdrop()
     })

@@ -375,6 +375,9 @@ export class Setting {
                 reduceMotion: value
             }
         }
+        window.dispatchEvent(new CustomEvent("codemotion-reduce-motion-change", {
+            detail: { reduceMotion: value }
+        }))
         
         if(set) {
             await window.electron.setSettings({ app: { reduceMotion: value }})

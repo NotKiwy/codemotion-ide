@@ -58,6 +58,12 @@ export function renderModalBase(options = {}) {
         modalWrapper.classList.add("hidden")
         hideBackdrop()
     })
+    modalWrapper.addEventListener("click", (event) => {
+        if (event.target !== modalWrapper) return
+
+        modalWrapper.classList.add("hidden")
+        hideBackdrop()
+    })
 
     if(typeof pages == "object" && pages.length > 0) {
         sideBarHandler(pages, {

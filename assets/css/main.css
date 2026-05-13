@@ -438,8 +438,11 @@ input~span {
     height: calc(100% - 44px)!important;
 }
 .explorer {
-    max-width: 300px;
-    min-width: 300px;
+    --explorer-width: 300px;
+    width: var(--explorer-width);
+    flex: 0 0 var(--explorer-width);
+    min-width: 220px;
+    max-width: 520px;
     height: 100%;
     background: var(--topbar-color);
     color: var(--text-color);
@@ -448,6 +451,47 @@ input~span {
     transition: .4s;
     border-left: 1px solid var(--block-divider-border-color);
     border-right: 1px solid var(--block-divider-border-color);
+}
+.explorer.resizing {
+    transition: none;
+}
+.explorer__resize-handle {
+    position: absolute;
+    top: 0;
+    right: -5px;
+    width: 10px;
+    height: 100%;
+    cursor: ew-resize;
+    z-index: 20;
+}
+.explorer__resize-handle::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    width: 2px;
+    height: 42px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: var(--text-color);
+    opacity: 0;
+    transition: opacity .2s;
+}
+.explorer__resize-handle:hover::after,
+.explorer.resizing .explorer__resize-handle::after {
+    opacity: .35;
+}
+body.explorer-resizing {
+    cursor: ew-resize;
+    user-select: none;
+}
+.explorer__resize-preview {
+    position: fixed;
+    width: 2px;
+    border-left: 2px solid rgba(255, 255, 255, .9);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .45);
+    pointer-events: none;
+    z-index: 9999;
 }
 .explorer.minimize {
     width: 20%;
@@ -1547,6 +1591,9 @@ input~span {
 
 .sidebar {
     width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    flex: 0 0 80px;
     background: var(--topbar-color);
     display: flex;
     flex-direction: column;
