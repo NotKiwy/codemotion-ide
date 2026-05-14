@@ -481,6 +481,16 @@ export async function openTab(path, content, extension, name, pathContext, isNew
         sendEvent("aceModeChanged", { extension: extension, editor: editor, mode: editor.session.$modeId })
     }
 
+    let cursorChangeTimer = null
+
+    function triggerCursorChanged() {
+        updateEditorData()
+        clearTimeout(cursorChangeTimer)
+        cursorChangeTimer = setTimeout(() => {
+            triggerAceChanged(editor)
+        }, 100)
+    }
+
     // 
     
     if("editor" in settings && "smoothScroll" in settings.editor) {
@@ -583,6 +593,8 @@ export async function openTab(path, content, extension, name, pathContext, isNew
         setEditorContext()
         triggerAceChanged(editor)
     });
+
+    editor.selection.on("changeCursor", triggerCursorChanged)
 
     editor.on('mousedown', function () {
         updateEditorData()
