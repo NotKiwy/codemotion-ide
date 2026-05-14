@@ -471,6 +471,7 @@ export async function openTab(path, content, extension, name, pathContext, isNew
                 editorMode: editor.session.$modeId,
                 editorLanguage: language.mode,
                 editorLanguageExtension: extension,
+                errors: editor.getSession().getAnnotations().filter(item => item.type === "error").length,
                 cursor: {
                     line: editor.getCursorPosition().row + 1,
                     column: editor.getCursorPosition().column + 1
