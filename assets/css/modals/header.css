@@ -4,8 +4,9 @@
     flex-direction: row;
     justify-content: space-between;
     padding: 15px 20px;
-    background: var(--block-divider-border-color);
     height: 20px;
+    border-bottom: 1px solid var(--block-divider-border-color);
+    background: #0000002e;
 }
 .modal-wrapper .modal-header.no-title {
     padding: 0px;
@@ -35,6 +36,7 @@
 }
 .modal-wrapper .modal-header .modal-header__close span[class^="material-symbols"] {
     font-size: 20px;
+    margin-left: 5px;
 }
 .modal-wrapper .modal-header .modal-header__close:hover {
     opacity: 1;
