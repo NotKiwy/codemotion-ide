@@ -437,7 +437,7 @@ ipcMain.handle("modify-local-bugs", async (_, { type, data }) => {
         }
 
         return {
-            id: bug.id ?? Date.now(),
+            id: bug.id ?? crypto.randomUUID(),
             priority: Number.isInteger(bug.priority) ? bug.priority : 0,
             value: String(bug.value || "").trim(),
             description: String(bug.description || "").trim(),
@@ -445,9 +445,13 @@ ipcMain.handle("modify-local-bugs", async (_, { type, data }) => {
             time: Number.isInteger(bug.time)
                 ? bug.time
                 : Math.floor(Date.now() / 1000),
-            resolved: Number.isInteger(bug.resolved) ? bug.resolved : 0
+            resolved: Number.isInteger(bug.resolved) ? bug.resolved : 0,
+            organization: bug.organization
+                ? String(bug.organization).trim()
+                : ""
         }
     }
+
     function writeBugs(data) {
         if (!Array.isArray(data)) {
             throw new Error("Data must be an array")
@@ -469,55 +473,105 @@ ipcMain.handle("modify-local-bugs", async (_, { type, data }) => {
 
         switch (type) {
             case "add": {
-                bugs.push(data)
+                const bug = normalizeBug(data)
+
+                bugs.push(bug)
                 writeBugs(bugs)
-                return { success: true }
+
+                return {
+                    success: true,
+                    data: bug
+                }
             }
 
             case "edit": {
-                let bugs = getLocalBugsData()
-
                 if (typeof data?.id === "undefined") {
-                    return { success: false, error: "Missing data.id" }
+                    return {
+                        success: false,
+                        error: "Missing data.id"
+                    }
                 }
 
-                const index = bugs.findIndex(bug => bug.id === data.id)
+                const normalizedBug = normalizeBug(data)
+
+                const index = bugs.findIndex(
+                    bug => String(bug.id) === String(normalizedBug.id)
+                )
 
                 if (index === -1) {
-                    return { success: false, error: "Bug not found" }
+                    return {
+                        success: false,
+                        error: "Bug not found"
+                    }
                 }
 
-                bugs[index] = data
-
+                bugs[index] = normalizedBug
                 writeBugs(bugs)
-                return { success: true }
+
+                return {
+                    success: true,
+                    data: normalizedBug
+                }
             }
 
             case "remove": {
-                let bugs = getLocalBugsData()
-
                 if (typeof data?.id === "undefined") {
-                    return { success: false, error: "Missing data.id" }
+                    return {
+                        success: false,
+                        error: "Missing data.id"
+                    }
                 }
 
                 const initialLength = bugs.length
-                bugs = bugs.filter(bug => bug.id !== data.id)
+
+                bugs = bugs.filter(
+                    bug => String(bug.id) !== String(data.id)
+                )
 
                 if (bugs.length === initialLength) {
-                    return { success: false, error: "Bug not found" }
+                    return {
+                        success: false,
+                        error: "Bug not found"
+                    }
                 }
 
                 writeBugs(bugs)
-                return { success: true }
+
+                return {
+                    success: true
+                }
+            }
+
+            case "set": {
+                if (!Array.isArray(data)) {
+                    return {
+                        success: false,
+                        error: "Data must be an array"
+                    }
+                }
+
+                const normalized = writeBugs(data)
+
+                return {
+                    success: true,
+                    data: normalized
+                }
             }
 
             default:
-                return { success: false, error: "Unknown type" }
+                return {
+                    success: false,
+                    error: "Unknown type"
+                }
         }
-
-    } catch (e) {
+    }
+    catch (e) {
         console.error("Handler error:", e)
-        return { success: false, error: e.message }
+
+        return {
+            success: false,
+            error: e.message
+        }
     }
 })
 

@@ -95,6 +95,10 @@ export function getAddBugModal() {
             if(bugAddingRes.success == true) {
                 addBugModal.close()
 
+                if (bugAddingRes.success) {
+                    bugsObject[bugAddingRes.data.id] = bugAddingRes.data
+                }
+
                 if(document.querySelector(".sidebar-item#bugs")) {
                     document.querySelector(".sidebar-item#bugs").click()
                 }
