@@ -22,6 +22,8 @@ const RENDERER_PATH = path.join(APP_PATH, "renderer.js")
 
 const DEFAULT_ICON = path.join(ASSETS_PATH, "media", "codemotion_icon.png")
 
+const API = "https://dev.yurba.one/api/pcode"
+
 module.exports = { 
     APP_PATH,
     SETTINGS_PATH,
@@ -37,5 +39,6 @@ module.exports = {
     ASSETS_PATH,
     DEFAULT_ICON,
     PRELOAD_PATH,
-    RENDERER_PATH
+    RENDERER_PATH,
+    API
 }

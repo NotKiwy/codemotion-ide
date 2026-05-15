@@ -63,7 +63,7 @@ export async function handleSettings(settingsObject) {
                                 min: 1,
                                 max: 4,
                                 value: 1,
-                                step: 1,
+                                step: 0.1,
                                 prefix: "x"
                             },
                             {

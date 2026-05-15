@@ -5,11 +5,10 @@ let isRegisteredCustomLanguageRegistration = false
 contextBridge.exposeInMainWorld('electron', {
     readDirTree: (rootPath, options = {}) => ipcRenderer.invoke('readDirTree', rootPath, options),
     readFileContent: (filePath, encoding = 'utf8') => ipcRenderer.invoke('readFileContent', filePath, encoding),
-    getUserPcInfo: () => ipcRenderer.invoke("getUserPcInfo"),
-    getPackageData: () => ipcRenderer.invoke("getPackageData"),
-    getLocalBugsData: () => ipcRenderer.invoke("getLocalBugsData"),
-    updateCalendarData: (data) => ipcRenderer.invoke("updateCalendarData", data),
-    saveFile: (path, content) => ipcRenderer.invoke("saveFile", path, content),
+    getUserPcInfo: () => ipcRenderer.invoke("get-user-pc-info"),
+    getPackageData: () => ipcRenderer.invoke("get-package-data"),
+    getLocalBugsData: () => ipcRenderer.invoke("get-local-bugs-data"),
+    saveFile: (path, content) => ipcRenderer.invoke("save-file", path, content),
 
     askToSaveNewFile: (name, content) => ipcRenderer.invoke("ask-to-save-content", name, content),
 
@@ -18,19 +17,19 @@ contextBridge.exposeInMainWorld('electron', {
     keyboardAction: (callback) => ipcRenderer.on("keyboard_action", (_, data) => callback(data)),
 
     getCurrentUserDataFromAPI: () => ipcRenderer.invoke("get-user-data-from-api"),
-    getOrgDataFromAPI: (orgid) => ipcRenderer.invoke("getOrgDataFromAPI", orgid),
+    getOrgDataFromAPI: (orgid) => ipcRenderer.invoke("get-org-data-from-api", orgid),
 
     close: () => ipcRenderer.send("close"),
     minimize: () => ipcRenderer.send("minimize"),
     maximize: () => ipcRenderer.send("fullscreen"),
-    getAllIcons: () => ipcRenderer.invoke("getAllIcons"),
+    getAllIcons: () => ipcRenderer.invoke("get-all-app-icons"),
 
     login: (username, password) => ipcRenderer.invoke("login", username, password),
     register: (username, password, passwordConfirm) => ipcRenderer.invoke("register", username, password, passwordConfirm),
     isLoggedIn: () => ipcRenderer.invoke("is-logged-in"),
     logout: () => ipcRenderer.invoke("logout"),
 
-    updateLocalAppData: (data) => ipcRenderer.send("updateLocalAppData", data),
+    updateLocalAppData: (data) => ipcRenderer.send("update-local-app-data", data),
     reload: () => ipcRenderer.send("reload"),
     goOffline: () => ipcRenderer.send("goOffline"),
 

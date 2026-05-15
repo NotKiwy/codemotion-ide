@@ -4,7 +4,7 @@ const path = require('path');
 const { LOCAL_FILE_PATH } = require("./helpers/paths.js")
 
 const tokenFile = LOCAL_FILE_PATH
-const API = 'https://dev.yurba.one/api/pcode';
+const { API } = require("./helpers/paths.js");
 
 async function register(username, password, passwordConfirm) {
     try {

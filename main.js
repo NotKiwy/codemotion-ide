@@ -11,7 +11,7 @@ const WebSocket = require("ws")
 const chokidar = require("chokidar")
 const bus = require("./helpers/eventBus.js")
 
-const { API, verifyToken } = require("./app/auth.js")
+const { verifyToken } = require("./app/auth.js")
 
 const { 
     SETTINGS_PATH, 
@@ -26,7 +26,8 @@ const {
     REGISTER_HTML_PATH,
     ASSETS_PATH,
     DEFAULT_ICON,
-    PRELOAD_PATH
+    PRELOAD_PATH,
+    API
 } = require("./app/helpers/paths.js")
 
 let mainWindow;
@@ -195,7 +196,7 @@ ipcMain.handle('readDirTree', async (_e, rootPath, options = {}) => {
     return readDirTree(rootPath, options);
 });
 
-ipcMain.handle('saveFile', async (event, fullPath, content) => {
+ipcMain.handle('save-file', async (event, fullPath, content) => {
     return await saveFile(fullPath, content);
 });
 
@@ -203,20 +204,15 @@ ipcMain.handle('readFileContent', async (_e, filePath, encoding = 'utf8') => {
     return readFileContent(filePath, encoding);
 });
 
-ipcMain.handle('getPackageData', async (_e) => {
+ipcMain.handle('get-package-data', async (_e) => {
     return getPackageData()
 });
 
-ipcMain.handle('getLocalBugsData', async (_e) => {
+ipcMain.handle('get-local-bugs-data', async (_e) => {
     return getLocalBugsData()
 });
 
-
-ipcMain.handle('updateCalendarData', async (_e, data) => {
-    return await saveFile(calendarFilePath, data)
-});
-
-ipcMain.handle("getUserPcInfo", async (event) => {
+ipcMain.handle("get-user-pc-info", async (event) => {
     return {
         platform: process.platform,
         arch: process.arch,
@@ -228,15 +224,11 @@ ipcMain.handle("getUserPcInfo", async (event) => {
     };
 });
 
-ipcMain.on('updateLocalAppData', async (_e, data) => {
+ipcMain.on('update-local-app-data', async (_e, data) => {
     updateLocalAppData(data)
 });
 
-ipcMain.handle('checkLogin', async (_e, username, password) => {
-    return await checkLogin(username, password)
-});
-
-ipcMain.handle('getAllIcons', () => {
+ipcMain.handle('get-all-app-icons', () => {
     return readFilesInFolder("./assets/media/icons");
 });
 
@@ -273,7 +265,7 @@ ipcMain.handle('get-user-data-from-api', async (event) => {
         }
     }
 })
-ipcMain.handle('getOrgDataFromAPI', async (event, orgID) => {
+ipcMain.handle('get-org-data-from-api', async (event, orgID) => {
     let api = `${API}/getOrg.php?id=${orgID}`
 
     try {
