@@ -210,7 +210,7 @@ ipcMain.handle("run-extension", async (event, code, permissions, meta) => {
         let APP = createAPI(permissions);
 
         const sandbox = {
-            console: console,
+            console: createSandboxConsole(extensionName, debuggerSender),
             Map: Map,
             APP
         };

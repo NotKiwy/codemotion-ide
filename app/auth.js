@@ -44,7 +44,7 @@ async function register(username, password, passwordConfirm) {
 async function login(username, password) {
     try {
         const response = await fetch(`${API}/checkLogin.php`, {
-            method: 'POST', // ⭐ Изменили с GET на POST!
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
