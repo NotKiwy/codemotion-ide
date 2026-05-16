@@ -172,7 +172,7 @@ export async function handleSettings(settingsObject) {
         if("devMode" in settingsObject.app) Setting.devMode(settingsObject.app.devMode, false)
         if("splashScreen" in settingsObject.app) Setting.splash(settingsObject.app.splashScreen, false)
         if("reduceMotion" in settingsObject.app) Setting.reduceMotion(settingsObject.app.reduceMotion, false)
-        if("uiScale" in settingsObject.app) Setting.uiScale(settingsObject.app.uiScale, false)
+        if("uiScale" in settingsObject.app) Setting.uiScale(settingsObject.app.uiScale, false, false)
     }
 }
 
@@ -301,12 +301,19 @@ export class Setting {
             await window.electron.setSettings({ editor: { pythonRunnerMethod: value }})
         }
     }
-    static uiScale(value, set = true) {
+    static uiScale(value, notification = true, set = true) {
         let v = Number(value)
 
         if(set) window.electron.setSettings({ app: { uiScale: v } })
 
         settingsSelectors.uiScale.value = value
+
+        if(notification) {
+            const n = new Notificator()
+            n.text = value + "x"
+            n.icon = "linear_scale"
+            n.show()
+        }
 
         document.body.style.setProperty("--ui-scale", value)
     }

@@ -100,6 +100,6 @@ window.electron.onAuthMsg((data) => {
 })
 
 document.querySelector("#skipAccountCreation").addEventListener("click", () => {
-    window.electron.setNonAccountMode()
+    window.electron.setNonAccountMode(true)
     window.electron.reload()
 })

@@ -166,6 +166,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         topbarCenterUserData.querySelector("#username").textContent = `Not authorized`
         topbarCenterUserData.querySelector("#current_hours").classList.add("v-hidden")
         topbarCenterBugsData.classList.add("v-hidden")
+
+        const loginPopupItem = document.createElement("div")
+        loginPopupItem.classList.add("popup-content__item")
+        loginPopupItem.textContent = "Login"
+
+        loginPopupItem.addEventListener("click", () => {
+            window.electron.setNonAccountMode(false)
+            window.electron.reload()
+        })
+
+        document.querySelector(`[popup="account"] .popup-content`).prepend(loginPopupItem)
     }
     else {
         getCurrentUserDataFromAPI().then((e) => {

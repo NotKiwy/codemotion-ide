@@ -26,7 +26,7 @@ export function getSettingsModal({ platform }) {
                                 title: "UI Scale",
                                 description: "Sets the UI scale factor",
                                 id: "setting_uiScale",
-                                min: 1,
+                                min: 0.5,
                                 max: 4,
                                 value: 1,
                                 step: 0.1,

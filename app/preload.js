@@ -10,10 +10,10 @@ contextBridge.exposeInMainWorld('electron', {
     getLocalBugsData: () => ipcRenderer.invoke("get-local-bugs-data"),
     getAppIcons: () => ipcRenderer.invoke("get-app-icons"),
     getAppIcon: () => ipcRenderer.invoke("get-app-icon"),
-    
+
     saveFile: (path, content) => ipcRenderer.invoke("save-file", path, content),
 
-    setNonAccountMode: () => ipcRenderer.invoke("set-non-account-mode"),
+    setNonAccountMode: (value) => ipcRenderer.invoke("set-non-account-mode", value),
 
     askToSaveNewFile: (name, content) => ipcRenderer.invoke("ask-to-save-content", name, content),
 
