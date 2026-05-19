@@ -46,6 +46,7 @@
         "mdPreview": "Markdown Preview",
         "htmlLiveServer": "Live Server",
         "errors": "Errors",
+        "project": "Project data",
 
         "codeSnippet": "Take screenshot",
         "copy": "Copy",

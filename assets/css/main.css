@@ -1257,13 +1257,17 @@ body.explorer-resizing {
 .column-element-linear-graphic__items {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 5px;
+    row-gap: 10px;
     justify-items: start;
+    margin-top: 5px;
 }
 .column-element-linear-graphic__items-item {
     display: flex;
     gap: 5px;
     align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    position: relative;
 }
 .column-element-linear-graphic__items-item__color {
     width: 5px;
@@ -1278,6 +1282,8 @@ body.explorer-resizing {
     font-size: 12px;
     font-weight: 400;
     opacity: .5;
+    position: absolute;
+    right: 20px;
 }
 
 .btn {

@@ -6,270 +6,312 @@ export class _Languages {
             name: "Text",
             icon: "default",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#9aa0a6"
         },
         js: {
             name: "JavaScript",
             icon: "js",
             iconExt: "svg",
-            mode: "javascript"
+            mode: "javascript",
+            color: "#f7df1e"
         },
         ts: {
             name: "TypeScript",
             icon: "ts",
             iconExt: "svg",
-            mode: "typescript"
+            mode: "typescript",
+            color: "#3178c6"
         },
         css: {
             name: "CSS",
             icon: "css",
             iconExt: "svg",
-            mode: "css"
+            mode: "css",
+            color: "#264de4"
         },
         scss: {
             name: "SCSS",
             icon: "scss",
             iconExt: "svg",
-            mode: "scss"
+            mode: "scss",
+            color: "#cf649a"
         },
         php: {
             name: "PHP",
             icon: "php",
             iconExt: "svg",
-            mode: "php"
+            mode: "php",
+            color: "#777bb4"
         },
         html: {
             name: "HTML",
             icon: "html",
             iconExt: "svg",
-            mode: "html"
+            mode: "html",
+            color: "#e34c26"
         },
         md: {
             name: "Markdown document",
             icon: "md",
             iconExt: "svg",
-            mode: "markdown"
+            mode: "markdown",
+            color: "#083fa1"
         },
         py: {
-            name: `Python`,
+            name: "Python",
             icon: "py",
             iconExt: "svg",
-            mode: "python"
+            mode: "python",
+            color: "#3776ab"
         },
         todo: {
-            name: `To-Do List`,
+            name: "To-Do List",
             icon: "todo",
             iconExt: "svg",
-            mode: "markdown"
+            mode: "markdown",
+            color: "#6c757d"
         },
         gitignore: {
-            name: `GIT File`,
+            name: "GIT File",
             icon: "gitignore",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#f14e32"
         },
         c: {
-            name: `C`,
+            name: "C",
             icon: "c",
             iconExt: "svg",
-            mode: "c_cpp"
+            mode: "c_cpp",
+            color: "#555555"
         },
         cs: {
-            name: `C#`,
+            name: "C#",
             icon: "csharp",
             iconExt: "svg",
-            mode: "csharp"
+            mode: "csharp",
+            color: "#178600"
         },
         cpp: {
-            name: `C++`,
+            name: "C++",
             icon: "cpp",
             iconExt: "svg",
-            mode: "c_cpp"
+            mode: "c_cpp",
+            color: "#00599c"
         },
         json: {
-            name: `JSON`,
+            name: "JSON",
             icon: "json",
             iconExt: "svg",
-            mode: "json"
+            mode: "json",
+            color: "#cbcb41"
         },
         txt: {
             name: "Text",
             icon: "txt",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#9aa0a6"
         },
         rs: {
             name: "Rust",
             icon: "rust",
             iconExt: "svg",
-            mode: "rust"
+            mode: "rust",
+            color: "#dea584"
         },
         mjs: {
             name: "JavaScript Module",
             icon: "js",
             iconExt: "svg",
-            mode: "javascript"
+            mode: "javascript",
+            color: "#f7df1e"
         },
         mts: {
             name: "TypeScript Module",
             icon: "ts",
             iconExt: "svg",
-            mode: "typescript"
+            mode: "typescript",
+            color: "#3178c6"
         },
         tsbuildinfo: {
             name: "TS Build Info",
             icon: "json",
             iconExt: "svg",
-            mode: "json"
+            mode: "json",
+            color: "#9aa0a6"
         },
         example: {
             name: "Environment Example",
             icon: "env",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#6c757d"
         },
         yml: {
             name: "YAML",
             icon: "yml",
             iconExt: "svg",
-            mode: "yaml"
+            mode: "yaml",
+            color: "#cb171e"
         },
         yaml: {
             name: "YAML",
             icon: "yml",
             iconExt: "svg",
-            mode: "yaml"
+            mode: "yaml",
+            color: "#cb171e"
         },
         jsx: {
             name: "React JavaScript",
             icon: "react",
             iconExt: "svg",
-            mode: "javascript"
+            mode: "javascript",
+            color: "#61dafb"
         },
         tsx: {
             name: "React TypeScript",
             icon: "react",
             iconExt: "svg",
-            mode: "typescript"
+            mode: "typescript",
+            color: "#3178c6"
         },
         cjs: {
             name: "JavaScript (CommonJS)",
             icon: "js",
             iconExt: "svg",
-            mode: "javascript"
+            mode: "javascript",
+            color: "#f7df1e"
         },
         cts: {
             name: "TypeScript (CommonJS)",
             icon: "ts",
             iconExt: "svg",
-            mode: "typescript"
+            mode: "typescript",
+            color: "#3178c6"
         },
         svg: {
             name: "SVG",
             icon: "svg",
             iconExt: "svg",
-            mode: "xml"
+            mode: "xml",
+            color: "#ffb13b"
         },
         env: {
             name: "Environment",
             icon: "env",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#6c757d"
         },
         ps1: {
             name: "PowerShell",
             icon: "ps",
             iconExt: "svg",
-            mode: "powershell"
+            mode: "powershell",
+            color: "#012456"
         },
-        // Image formats
         png: {
             name: "Image",
             icon: "image",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#9aa0a6"
         },
         jpg: {
             name: "Image",
             icon: "image",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#9aa0a6"
         },
         jpeg: {
             name: "Image",
             icon: "image",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#9aa0a6"
         },
         gif: {
             name: "Image",
             icon: "image",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#9aa0a6"
         },
         webp: {
             name: "Image",
             icon: "image",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#9aa0a6"
         },
         ico: {
             name: "Image",
             icon: "image",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#9aa0a6"
         },
         bmp: {
             name: "Image",
             icon: "image",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#9aa0a6"
         },
-        // Font formats
         ttf: {
             name: "Font",
             icon: "font",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#d4b483"
         },
         woff: {
             name: "Font",
             icon: "font",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#d4b483"
         },
         woff2: {
             name: "Font",
             icon: "font",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#d4b483"
         },
         otf: {
             name: "Font",
             icon: "font",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#d4b483"
         },
         eot: {
             name: "Font",
             icon: "font",
             iconExt: "svg",
-            mode: "text"
+            mode: "text",
+            color: "#d4b483"
         },
         lua: {
             name: "Lua",
             icon: "lua",
             iconExt: "svg",
-            mode: "lua"
+            mode: "lua",
+            color: "#000080"
         },
         luau: {
             name: "Luau",
             icon: "lua",
             iconExt: "svg",
-            mode: "lua"
+            mode: "lua",
+            color: "#000080"
         }
     }
-
+    
     static addContext(name, value) {
         this.contexts[name] = value
     }
