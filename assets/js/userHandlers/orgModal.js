@@ -183,8 +183,6 @@ export async function createUserOrgModal({ gls, userOrgs, userJSON }) {
     const createOrgWebsiteField = element.querySelector("#orgWebsite")
     const createOrgSubmitBtn = element.querySelector("#orgConfirm")
     const modalPreview = element.querySelector(".modal-org#orgPreview")
-    
-    console.log(element)
 
     createOrgNameField.addEventListener("input", (e) => {
         modalPreview.querySelector(".modal-org__title p").textContent = e.target.value

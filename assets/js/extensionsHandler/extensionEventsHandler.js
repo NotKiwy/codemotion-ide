@@ -1,4 +1,4 @@
-import { Options, Languages, Dirs, escapeHtml, loadAceModule } from "../lib.js"
+import { Options, Languages, Dirs, escapeHtml, loadAceModule, createNotify } from "../lib.js"
 import { optionsThemeButtonHandler } from "../handlers/themesHandler.js"
 import { themeEditors } from "../../components/tabHandler.js"
 import { registerAceLanguage } from "../../../helpers/aceRegisterLanguage.js"
@@ -467,5 +467,16 @@ export function handleExtensionEvents() {
         }
 
         refreshEditorHighlight()
+    })
+
+    window.electron.onNotification((name, data) => {
+        if("content" in data) {
+            data["content"] = `(${name}) ${data.content}`
+        }
+        if("time" in data) {
+            if(data.time > 15000) data.time = 4000 
+        }
+
+        createNotify(data)
     })
 }

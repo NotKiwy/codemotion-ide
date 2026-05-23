@@ -116,6 +116,7 @@ contextBridge.exposeInMainWorld('electron', {
     onNewDirIconRegister: (callback) => ipcRenderer.on("new-dir-icon-register", (event, data) => callback(data)),
     onNewDocumentationTypesRegister: (callback) => ipcRenderer.on("new-documentation-types-register", (event, data) => callback(data)),
     onExtLog: (callback) => ipcRenderer.on("extension-log", (event, data) => callback(data)),
+    onNotification: (callback) => ipcRenderer.on("extension-notification", (event, name, data) => callback(name, data)),
 
     onEditorChangeNewHLRules: (callback) => ipcRenderer.on("on-editor-change-new-hl-rules", (event, data) => callback(data)),
 

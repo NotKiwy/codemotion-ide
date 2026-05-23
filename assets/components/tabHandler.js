@@ -216,10 +216,25 @@ function initializeGlobalButtons(settings = {}) {
                 isLiveServerActive = true
                 SideBarLiveServerIcon.set("active")
                 SideBarLiveServerIcon.blink()
-                createNotify("sensors", "Live server enabled", server.url, 5000)
+
+                createNotify(
+                    {
+                        type: "success",
+                        icon: "sensors",
+                        title: "Live server enabled",
+                        content: server.url
+                    }
+                )
             }
             else {
-                createNotify("sensors", "Live server error", server.error, 5000)
+                createNotify(
+                    {
+                        type: "danger",
+                        icon: "sensors",
+                        title: "Live server error",
+                        content: server.error
+                    }
+                )
             }
         }
         else {
@@ -230,11 +245,26 @@ function initializeGlobalButtons(settings = {}) {
                 SideBarLiveServerIcon.set("unactive")
                 SideBarLiveServerIcon.blink(false)
 
-                createNotify("sensors", "Live server disabled", "Live server is not working now", 5000)
+                createNotify(
+                    {
+                        type: "warn",
+                        icon: "sensors",
+                        title: "Live server disabled",
+                        content: "Live server is not working now"
+                    }
+                )
             }
             else {
                 isLiveServerActive = false
-                createNotify("sensors", "Live server error", server.error, 5000)
+
+                createNotify(
+                    {
+                        type: "danger",
+                        icon: "sensors",
+                        title: "Live server error",
+                        content: server.error
+                    }
+                )
             }
         }
     }
@@ -797,7 +827,14 @@ function bindEditorBtns(editor) {
     if (copyBtn) {
         copyBtn.addEventListener("click", () => {
             navigator.clipboard.writeText(editor.getValue())
-            createNotify("info", "Text copied", "Text copied to clipboard!")
+
+            createNotify(
+                {
+                    icon: "content_copy",
+                    title: "Text copied",
+                    content: "Text copied to clipboard!"
+                }
+            )
         })
     }
 
@@ -810,7 +847,14 @@ function bindEditorBtns(editor) {
                     ])
                 })
                 let image = canvas.toDataURL("image/png")
-                createNotify("image", "Screenshot taken!", "Screenshot taken and copied to your clipboard", undefined, image)
+
+                createNotify(
+                    {
+                        icon: "image",
+                        title: "Screenshot taken!",
+                        content: "Screenshot taken and copied to your clipboard"
+                    }
+                )
             })
         })
     }

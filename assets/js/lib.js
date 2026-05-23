@@ -630,7 +630,7 @@ export function createNotify(properties = {}) {
     const type = valid(properties.type) ?? "info_i"
     const icon = valid(properties.icon) ?? "info_i"
     const title = valid(properties.title) ?? "Untitled"
-    const content = valid(properties.content) ?? ""
+    const content = valid(properties.content) ?? "No description provided"
     const time = valid(properties.time) ?? 3000
     const image = valid(properties.image) ?? false
 
