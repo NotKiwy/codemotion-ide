@@ -11,6 +11,9 @@ async function setProjectDataUsedLanguages(path) {
     const graph = document.querySelector("#project_analys_graphic")
     const graphItems = document.querySelector("#project_analys_graphic_items")
 
+    graph.innerHTML = ""
+    graphItems.innerHTML = ""
+
     document.querySelector("#project_analys_files").textContent = usedLanguages.totalFiles
     document.querySelector("#project_analys_path").textContent = path
 
