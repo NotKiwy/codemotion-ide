@@ -71,7 +71,14 @@ export async function getCurrentUserDataFromAPI(gls, properties = {}) {
 
     document.querySelectorAll("#username").forEach(e => e.textContent = userJSON.name);
     document.querySelectorAll("#greeting").forEach(e => e.textContent = gls.get("greeting.default", { name: userJSON.name }));
-    document.querySelectorAll("#bug_counter").forEach(e => e.textContent = bugs.length);
+    document.querySelectorAll("#bug_counter").forEach(e => {
+        e.innerHTML = `
+            <div class="bugs-assigned">${Object.keys(bugsAssigned).length}</div>
+            <div class="bugs-created">${Object.keys(bugsCreated).length}</div>
+            <div class="divider"></div>
+            <div class="bugs-all">${Object.keys({...bugsAssigned, ...bugsCreated}).length}</div>
+        `
+    });
     document.querySelector("#userAvatar").innerHTML = generateAvatar(userJSON.name)
 
     appendBugs(bugsCreated, "created")

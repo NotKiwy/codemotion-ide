@@ -35,6 +35,7 @@ export function sideBarHandler(pagesArray = [], properties = {}) {
         const name = valid(p.name) ?? "Unnamed"
         const icon = valid(p.icon) ?? false
         const content = valid(p.content) ?? false
+        const label = valid(p.label) ?? false
         const id = idify(name)
 
         const item = createSidebarItem()
@@ -47,6 +48,14 @@ export function sideBarHandler(pagesArray = [], properties = {}) {
             itemIcon.textContent = icon
 
             item.prepend(itemIcon)
+        }
+
+        if(label) {
+            const labelEl = document.createElement("span")
+            labelEl.classList.add("modal-sidebar__item-label")
+            labelEl.textContent = label
+
+            item.appendChild(labelEl)
         }
 
         // adding click action (show sidebar page)

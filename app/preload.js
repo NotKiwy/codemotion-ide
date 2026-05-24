@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld('electron', {
     requestMakeVerifyBug: (params) => ipcRenderer.invoke("request-make-verify-bug", params),
     requestGetYourOrgColleagues: () => ipcRenderer.invoke("request-get-your-org-colleagues"),
     createOrganization: (params) => ipcRenderer.invoke("create-organization", params),
+    requestExploreOrganizations: () => ipcRenderer.invoke("get-explore-organizations"),
 
     createNotification: (data) => ipcRenderer.send("spawn-notification", data),
 

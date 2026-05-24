@@ -6,6 +6,11 @@
         "withoutUsername": "How are you feeling today?"
     },
 
+    "errorPlaceholder": {
+        "title": "O-o-oops!",
+        "description": "There seems to be an error with this request, so please try again later and be sure to let us know. We hope you'll bear with us"
+    },
+
     "platformNotSupported": "Your platform (%{platform}) is not supported",
 
     "notAuth": "Not authenticated",
@@ -75,7 +80,43 @@
             "roleLabel": "Role",
             "ownerLabel": "You are the founder of this organization",
             "secondRoleLabel": "Your secondary role: %{role}",
-            "ownerRoleLabel": "Founder"
+            "ownerRoleLabel": "Founder",
+            "explore": {
+                "title": "Explore"
+            },
+            "membership": {
+                "title": "Membership"
+            },
+            "createNew": {
+                "title": "Create new",
+                "header": {
+                    "title": "Create new organization",
+                    "description": "With your organization, you can invite users to join so you can work on projects together. For example, you can create collaborative bugs"
+                },
+                "inputs": {
+                    "name": "Organization name",
+                    "about": "About this organization",
+                    "website": "Organization website (optional)"
+                },
+                "preview": {
+                    "title": "Preview",
+                    "description": "A preview of how the organization will appear in the list",
+                    "emptyName": "Unnamed",
+                    "emptyDescription": "No description provided"
+                }
+            },
+            "buttons": {
+                "create": "Create organization"
+            },
+            "notifications": {
+                "creatingError": {
+                    "title": "Organization creating error"
+                },
+                "creatingSuccess": {
+                    "title": "Organization created!",
+                    "description": "Your organization \"%{name}\" created"
+                }
+            }
         },
 
         "appearance": {

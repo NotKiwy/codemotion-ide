@@ -17,6 +17,7 @@
     align-items: stretch;
     justify-content: flex-start;
     overflow: hidden;
+    flex-shrink: 0;
 }
 .modal-org p {
     margin: 0px;

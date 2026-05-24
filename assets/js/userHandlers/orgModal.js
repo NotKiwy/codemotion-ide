@@ -2,7 +2,9 @@ import { Modal } from "../modalsHandler/engine.js"
 import { createNotify, getInitials, truncateString } from "../lib.js"
 import { sendEvent } from "../bus.js"
 
-export async function createUserOrgsModalStructure({ gls, userOrgs, userJSON }) {
+export async function createUserOrgsModalStructure({ gls, userOrgs, userJSON, roleVisible }) {
+    roleVisible = roleVisible == undefined ? true : roleVisible
+
     const organizationsModalData = await Promise.all(
         userOrgs.map(async (organization) => {
             const organizationReq =
@@ -64,6 +66,10 @@ export async function createUserOrgsModalStructure({ gls, userOrgs, userJSON }) 
                     organizationData.verified == 1
             }
 
+            if(!roleVisible) {
+                delete preparedData["columns"][1]
+            }
+
             if (isOwner) {
                 preparedData.note = `
                     ${gls.get("modals.organizations.ownerLabel")}
@@ -89,16 +95,45 @@ export async function createUserOrgsModalStructure({ gls, userOrgs, userJSON }) 
 }
 
 export async function createUserOrgModal({ gls, userOrgs, userJSON }) {
+    function lgls(string, variables = {}) {
+        return gls.get(`modals.organizations.${string}`, variables)
+    }
+
+    const exploreOrganizationsRes = await window.electron.requestExploreOrganizations()
+
+    const errorPlaceholder = {
+        type: "placeholder",
+        title: gls.get("errorPlaceholder.title"),
+        description: gls.get("errorPlaceholder.description")
+    }
+
     const orgModal = Modal.create({
         id: "organizations",
         name: "Organizations",
         modalClassList: ["window"],
-        title: gls.get("modals.organizations.title"),
+        title: lgls("title"),
 
         pages: [
             {
-                name: "Membership",
+                name: lgls("explore.title"),
+                icon: "explore",
+                label: exploreOrganizationsRes.success ? Object.keys(exploreOrganizationsRes).length : 0,
+
+                content: [
+                    {
+                        type: "row",
+                        gap: 10,
+                        items: exploreOrganizationsRes.success ?
+                            await createUserOrgsModalStructure({ gls: gls, userOrgs: exploreOrganizationsRes.msg, userJSON: userJSON, roleVisible: false })
+                            :
+                            [errorPlaceholder]
+                    }
+                ]
+            },
+            {
+                name: lgls("membership.title"),
                 icon: "group",
+                label: Object.keys(userOrgs).length,
 
                 content: [
                     {
@@ -109,7 +144,7 @@ export async function createUserOrgModal({ gls, userOrgs, userJSON }) {
                 ]
             },
             {
-                name: "Create new",
+                name: lgls("createNew.title"),
                 icon: "add",
 
                 content: [
@@ -119,42 +154,42 @@ export async function createUserOrgModal({ gls, userOrgs, userJSON }) {
                         items: [
                             {
                                 type: "placeholder",
-                                title: "Create new organization",
-                                description: "With your organization, you can invite users to join so you can work on projects together. For example, you can create collaborative issues."
+                                title: lgls("createNew.header.title"),
+                                description: lgls("createNew.header.description")
                             },
                             {
                                 type: "input",
-                                placeholder: "Organization name",
+                                placeholder: lgls("createNew.inputs.name"),
                                 id: "orgName"
                             },
                             {
                                 type: "input",
-                                placeholder: "About your organization",
+                                placeholder: lgls("createNew.inputs.about"),
                                 id: "orgDesc"
                             },
                             {
                                 type: "input",
-                                placeholder: "Organization website (optional)",
+                                placeholder: lgls("createNew.inputs.website"),
                                 id: "orgWebsite"
                             },
                             {
                                 type: "placeholder",
-                                title: "Preview",
-                                description: "A preview of how the organization will appear in the list"
+                                title: lgls("createNew.preview.title"),
+                                description: lgls("createNew.preview.description")
                             },
                             {   
                                 id: "orgPreview",
                                 type: "organization",
-                                name: "Unnamed",
-                                description: "No description provided",
+                                name: lgls("createNew.preview.emptyName"),
+                                description: lgls("createNew.preview.emptyDescription"),
                                 columns: [
                                     {
-                                        name: "Members",
+                                        name: lgls("membersLabel"),
                                         value: 1
                                     },
                                     {
-                                        name: "Role",
-                                        value: "Fouder"
+                                        name: lgls("roleLabel"),
+                                        value: lgls("ownerRoleLabel")
                                     }
                                 ],
                                 website: "https://example.com/",
@@ -167,7 +202,7 @@ export async function createUserOrgModal({ gls, userOrgs, userJSON }) {
                             {
                                 type: "button",
                                 id: "orgConfirm",
-                                title: "Create organization",
+                                title: lgls("buttons.create"),
                                 container: "#buttonsContainer"
                             }
                         ]
@@ -189,7 +224,7 @@ export async function createUserOrgModal({ gls, userOrgs, userJSON }) {
         modalPreview.querySelector(".generated-avatar").textContent = getInitials(e.target.value)
 
         if(e.target.value.length == 0) {
-            modalPreview.querySelector(".modal-org__title p").textContent = "Unnamed"
+            modalPreview.querySelector(".modal-org__title p").textContent = lgls("createNew.preview.emptyName")
             modalPreview.querySelector(".generated-avatar").textContent = getInitials("U")
         }
     })
@@ -197,7 +232,7 @@ export async function createUserOrgModal({ gls, userOrgs, userJSON }) {
         modalPreview.querySelector(".modal-org-description").textContent = truncateString(e.target.value, 100)
 
         if(e.target.value.length == 0) {
-            modalPreview.querySelector(".modal-org-description").textContent = "No description provided"
+            modalPreview.querySelector(".modal-org-description").textContent = lgls("createNew.preview.emptyDescription")
         }
     })
     createOrgWebsiteField.addEventListener("input", (e) => {
@@ -224,8 +259,9 @@ export async function createUserOrgModal({ gls, userOrgs, userJSON }) {
         if(!createOrgRes.success) {
             createNotify(
                 {
+                    type: "danger",
                     icon: "close",
-                    title: "Organization creating error",
+                    title: lgls("notifications.creatingError.title"),
                     content: createOrgRes.msg.message == undefined ? createOrgRes.msg : createOrgRes.msg.message
                 }
             )
@@ -239,9 +275,10 @@ export async function createUserOrgModal({ gls, userOrgs, userJSON }) {
 
             createNotify(
                 {
+                    type: "success",
                     icon: "check",
-                    title: "Organization created!",
-                    content: `Your organization "${createOrgRes.msg.name}" created`
+                    title: lgls("notifications.creatingSuccess.title"),
+                    content: lgls("notifications.creatingSuccess.description", { name: createOrgRes.msg.name })
                 }
             ) 
         }

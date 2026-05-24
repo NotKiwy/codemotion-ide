@@ -291,7 +291,6 @@ function initializeGlobalButtons(settings = {}) {
             pythonRunMethod = settings.editor.pythonRunnerMethod
         }
 
-        console.log("RUNPY:", pythonRunMethod)
         const pythonResult = await window.electron.runPython({ filePath: currentPath, useEmbed: pythonRunMethod == "builtin" })
 
         if (pythonResult.type == "success") {

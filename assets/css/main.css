@@ -335,6 +335,7 @@ input~span {
 }
 .topbar-center {
     background: var(--topbar-menu-item-hover-bg);
+    border: 1px solid var(--context-border);
     font-size: 12px;
     color: #d1d1d1;
     line-height: 20px;
@@ -368,6 +369,58 @@ input~span {
 }
 .topbar-center span[class^="material-symbols"] {
     font-size: 15px;
+}
+
+.topbar-center span#bug_counter {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.topbar-center .bugs-assigned {
+    color: var(--warning);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+.topbar-center .bugs-assigned::before {
+    content: "A";
+    background: var(--warning);
+    color: black;
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    font-size: 8px;
+    font-weight: 700;
+}
+.topbar-center .bugs-created {
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+.topbar-center .bugs-created::before {
+    content: "C";
+    background: var(--danger);
+    color: black;
+    width: 12px;
+    height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    font-size: 8px;
+    font-weight: 700;
+}
+.topbar-center .divider {
+    width: 1px;
+    height: 20px;
+    background: var(--context-border);
+    border-radius: 100%;
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 .topbar-center.notification {

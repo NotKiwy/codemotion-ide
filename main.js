@@ -67,7 +67,8 @@ const {
     requestMakeVerifyBug,
     requestGetYourOrgColleagues,
     getUsedLanguagesByPath,
-    requestCreateOrganization
+    requestCreateOrganization,
+    requestExploreOrganizations
 } = require("./app/helpers/requests.js")
 
 const { spawnNotification } = require("./app/notifications/notifications.js")
@@ -648,6 +649,9 @@ ipcMain.handle("create-organization", async (_, params) => {
 })
 ipcMain.on("spawn-notification", (_, data) => {
     spawnNotification(data)
+})
+ipcMain.handle("get-explore-organizations", async (_) => {
+    return await requestExploreOrganizations()
 })
 
 app.whenReady().then(createWindow);

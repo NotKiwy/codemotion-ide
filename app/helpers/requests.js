@@ -432,6 +432,30 @@ async function requestCreateOrganization({ name, description, website }) {
     }
 }
 
+async function requestExploreOrganizations() {
+    const userToken = await getUserToken()
+
+    try {
+        const response = await fetch(`${API}/getExploreOrgs.php`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${userToken}`
+            },
+            body: {}
+        });
+
+        const data = await response.json()
+
+        if (data.success) {
+            return { success: true, msg: data.result }
+        } else {
+            return { success: false, msg: data.result }
+        }
+    } catch (error) {
+        return { success: false, msg: error }
+    }
+}
+
 async function getUsedLanguagesByPath(targetPath) {
     const languages = {
         js: {
@@ -578,5 +602,6 @@ module.exports = {
     requestMakeVerifyBug,
     requestGetYourOrgColleagues,
     getUsedLanguagesByPath,
-    requestCreateOrganization
+    requestCreateOrganization,
+    requestExploreOrganizations
 }
