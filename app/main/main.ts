@@ -1,21 +1,19 @@
 import type { IpcMainEvent, IpcMainInvokeEvent } from "electron"
 import { NotificationDataPayload } from "./payloads";
 
-const { app, BrowserWindow, screen, ipcMain, dialog, shell } = require('electron');
-const path = require('path');
-const fs = require('fs');
-const { GlobalKeyboardListener } = require("node-global-key-listener");
+import { app, BrowserWindow, screen, ipcMain, dialog, shell } from "electron"
+import path from "node:path"
+import fs from "node:fs"
+import { GlobalKeyboardListener } from "node-global-key-listener";
+
 const v = new GlobalKeyboardListener();
 const bus = require("../../helpers/eventBus")
 
 const { verifyToken } = require("../auth")
 
-const { 
-    HTML_PATH,
-    JSON_PATH,
-} = require("../main/helpers/paths.js")
+const { HTML_PATH, JSON_PATH } = require("../main/helpers/paths.js")
 
-let mainWindow: InstanceType<typeof BrowserWindow> | null = null
+let mainWindow: any
 let workSeconds: number = 0
 
 require("../sandbox/sandbox")
