@@ -1,5 +1,5 @@
 const { BrowserWindow, screen, ipcMain } = require("electron")
-const { HTML_PATH, APP_PATH } = require("../helpers/paths.js")
+const { HTML_PATH, APP_PATH } = require("../main/helpers/paths.js")
 
 const path = require("path")
 
@@ -38,6 +38,8 @@ function closeNotification(win) {
 }
 
 function spawnNotification(properties = {}) {
+    ipcMain.removeAllListeners("notification-close")
+
     const timeout = properties.timeout ?? 4000
 
     const win = new BrowserWindow({

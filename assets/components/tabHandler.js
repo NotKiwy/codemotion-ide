@@ -36,7 +36,7 @@ import { minifyJS, minifyCSS } from "../js/handlers/minifyHandlers.js"
 import { initCodeContextMenu, destroyCodeContextMenu } from "./codeContextMenu.js"
 import { enableSave, disableSave } from "../../app/renderer.js"
 import { bus, sendEvent } from "../js/bus.js"
-import { ColorComments } from "../../app/helpers/ace/colorComments.js"
+import { ColorComments } from "../../app/main/helpers/ace/colorComments.js"
 
 import { renderPyMsgSuccess, renderPyMsgErr } from "./pythonRuntime/runtimeHandler.js"
 

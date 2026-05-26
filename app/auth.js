@@ -1,10 +1,10 @@
 const { ipcMain, app } = require('electron');
 const fs = require('fs');
 const path = require('path');
-const { LOCAL_FILE_PATH } = require("./helpers/paths.js")
+const { LOCAL_FILE_PATH } = require("./main/helpers/paths.js")
 
 const tokenFile = LOCAL_FILE_PATH
-const { API } = require("./helpers/paths.js");
+const { API } = require("./main/helpers/paths.js");
 
 async function register(username, email, password, passwordConfirm) {
     try {

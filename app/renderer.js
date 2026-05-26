@@ -277,7 +277,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const rec = tabsByPath.get(currentPath);
 
         if (rec.new) {
-            const saveNewFileRes = await window.electron.askToSaveNewFile(currentPath, rec.editor.getValue());
+            const saveNewFileRes = await window.electron.askToSaveNewFile(
+                {
+                    name: currentPath, 
+                    content: rec.editor.getValue()
+                });
 
             if (saveNewFileRes.success) {
                 const newPath = saveNewFileRes.path;

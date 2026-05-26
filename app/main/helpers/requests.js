@@ -316,14 +316,14 @@ async function getUserToken() {
     }
 }
 
-async function requestAddBug({ title = "Unnamed", description = "No description provided", priority = 0, private = 0, assignTo = 0 }) {
+async function requestAddBug({ title = "Unnamed", description = "No description provided", priority = 0, isPrivate = 0, assignTo = 0 }) {
     const userToken = await getUserToken()
 
     const formData = new FormData();
     formData.append('name', title);
     formData.append('description',  description);
     formData.append('priority', priority);
-    formData.append('private', private);
+    formData.append('private', isPrivate);
     
     if(assignTo != 0) {
         formData.append('touserid', assignTo);

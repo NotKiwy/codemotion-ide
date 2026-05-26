@@ -27,7 +27,7 @@ contextBridge.exposeInMainWorld('electron', {
 
     setNonAccountMode: (value) => ipcRenderer.invoke("set-non-account-mode", value),
 
-    askToSaveNewFile: (name, content) => ipcRenderer.invoke("ask-to-save-content", name, content),
+    askToSaveNewFile: (propreties) => ipcRenderer.invoke("ask-to-save-content", propreties),
 
     modifyLocalBugs: (type, data) => ipcRenderer.invoke("modify-local-bugs", type, data),
 
