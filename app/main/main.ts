@@ -227,6 +227,4 @@ app.on('window-all-closed', () => {
             writeSettings({ app: { workSecondsSession: Math.round(workSeconds * 10) / 10 }})
         }
     }
-
-    console.log(`Worked: ${workSeconds}s`)
 });
