@@ -195,7 +195,7 @@ body.bottom-window-resizing {
     padding: 10px;
     align-items: center;
     justify-content: space-between;
-    position: absolute;
+    position: fixed;
     width: -webkit-fill-available;
     background: var(--body-color-transparent);
     z-index: 2;

@@ -107,6 +107,11 @@ contextBridge.exposeInMainWorld('electron', {
     getDirname: () => ipcRenderer.invoke("get-dirname"),
     getPlatform: () => ipcRenderer.invoke("get-platform"),
 
+    typescriptDiagnostic: (code) => ipcRenderer.invoke("typescript-diagnostic", code),
+    javascriptDiagnostic: (code) => ipcRenderer.invoke("javascript-diagnostic", code),
+    javascriptAST: (code) => ipcRenderer.invoke("javascript-ast", code),
+    typescriptAST: (code) => ipcRenderer.invoke("typescript-ast", code),
+
     // for extensions
 
     runExtension: (code, permissions, meta) => ipcRenderer.invoke("run-extension", code, permissions, meta),

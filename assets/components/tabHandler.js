@@ -6,6 +6,7 @@ import {
     runCode,
     runSandbox,
     addRuntimeError,
+    clearRuntimeErrors,
     isFloat,
     isStringifiedObject,
     createNotify,
@@ -19,7 +20,6 @@ import {
 import { BottomWindow, closeAllWindows } from "../js/handlers/BottomWindowHandler.js"
 import { initJSSH } from "../../ace/plugins/languageSyntaxEnhance.js"
 import { enableSmoothScroll } from "../plugins/aceSmoothScroller/index.js"
-import { JavascriptParser, JSONParser, HTMLParser } from '../js/contextParser.js'
 import {
     setCurrentLanguage,
     setColumn,
@@ -39,6 +39,12 @@ import { bus, sendEvent } from "../js/bus.js"
 import { ColorComments } from "../../app/helpers/ace/colorComments.js"
 
 import { renderPyMsgSuccess, renderPyMsgErr } from "./pythonRuntime/runtimeHandler.js"
+
+import { TypescriptParser } from "../js/contextParsers/typescriptParser.js"
+import { JavascriptParser } from "../js/contextParsers/javascriptParser.js"
+import { JSONParser } from "../js/contextParsers/jsonParser.js"
+import { HTMLParser } from "../js/contextParsers/htmlParser.js"
+import { CSSParser } from "../js/contextParsers/cssParser.js"
 
 export const recentlyClosed = new Map();
 export const tabsByPath = new Map();
@@ -474,6 +480,7 @@ export async function openTab(path, content, extension, name, pathContext, isNew
     addThemeModificator(editor)
 
     const ErrorsHistoryWindow = new BottomWindow("errorsHistory", { title: "Errors history" })
+    clearRuntimeErrors()
 
     const imagePreviewWindow = new BottomWindow("imagePreview", { title: "Preview" })
     imagePreviewWindow.removeClose()
@@ -570,46 +577,88 @@ export async function openTab(path, content, extension, name, pathContext, isNew
         setErrors(editor.getSession().getAnnotations())
     }
 
-    function setEditorContext() {
+    async function setEditorContext() {
         updateEditorData()
 
         if (language.mode == "javascript") {
-            function parse(code) {
-                return acorn.parse(code, {
-                    ecmaVersion: "latest",
-                    locations: true
-                });
-            }
+            let debounceTimer;
+
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(async () => {
+                const jsDiagnostic = await window.electron.javascriptDiagnostic(editor.getValue())
+
+                if(jsDiagnostic.length > 0) {
+                    jsDiagnostic.forEach(item => {
+                        addRuntimeError(
+                            {
+                                msg: `${item.message}`,
+                                line: item.line,
+                                col: item.col,
+                                time: Math.floor(Date.now() / 1000)
+                            }
+                        )
+                    })
+                }
+                else {
+                    addRuntimeError(
+                        {
+                            isNull: true,
+                            time: Math.floor(Date.now() / 1000)
+                        }
+                    )
+                }
+            }, 500)
+
             function getCursorRow() {
                 return editor.getCursorPosition().row + 1;
             }
             const jsParser = new JavascriptParser()
 
-            let ast;
-            try {
-                ast = parse(editor.getValue());
-                addRuntimeError(
-                    {
-                        isNull: true,
-                        time: Math.floor(Date.now() / 1000)
-                    }
-                )
-            } catch (e) {
-                addRuntimeError(
-                    {
-                        msg: `${e} (${e.pos})`,
-                        line: e.loc.line,
-                        col: e.loc.column,
-                        time: Math.floor(Date.now() / 1000)
-                    }
-                )
-                return;
-            }
-
+            const ast = await window.electron.javascriptAST(editor.getValue())
             const row = getCursorRow();
 
             const chain = jsParser.getContextChain(ast, row);
             jsParser.renderContext(chain);
+        }
+        else if(language.mode == "typescript") {
+            let debounceTimer;
+
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(async () => {
+                const tsDiagnostic = await window.electron.typescriptDiagnostic(editor.getValue())
+
+                if(tsDiagnostic.length > 0) {
+                    tsDiagnostic.forEach(item => {
+                        addRuntimeError(
+                            {
+                                msg: `${item.message}`,
+                                line: item.line,
+                                col: item.col,
+                                time: Math.floor(Date.now() / 1000)
+                            }
+                        )
+                    })
+                }
+                else {
+                    addRuntimeError(
+                        {
+                            isNull: true,
+                            time: Math.floor(Date.now() / 1000)
+                        }
+                    )
+                }
+            }, 500)
+
+            function getCursorRow() {
+                return editor.getCursorPosition().row + 1;
+            }
+            const tsParser = new TypescriptParser()
+
+            const ast = await window.electron.typescriptAST(editor.getValue())
+            const row = getCursorRow();
+
+            const chain = tsParser.getContextChain(ast, row);
+            tsParser.renderContext(chain);
         }
         else if (language.mode == "json") {
             const jsonParser = new JSONParser()
@@ -618,6 +667,16 @@ export async function openTab(path, content, extension, name, pathContext, isNew
         else if (language.mode == "html") {
             const htmlParser = new HTMLParser()
             htmlParser.showHTMLContext(editor, document.querySelector(".code-structure"))
+        }
+        else if(language.mode == "css") {
+            function getCursorRow() {
+                return editor.getCursorPosition().row + 1;
+            }
+            const cssParser = new CSSParser()
+            const row = getCursorRow();
+
+            const chain = cssParser.getContextChain(editor.getValue(), row);
+            cssParser.renderContext(chain);
         }
         else {
             const codeStructure = document.querySelector(".code-structure");
@@ -636,9 +695,9 @@ export async function openTab(path, content, extension, name, pathContext, isNew
         }
     });
 
-    editor.session.on('change', function (delta) {
+    editor.session.on('change', async function (delta) {
         updateEditorData()
-        setEditorContext()
+        await setEditorContext()
         triggerAceChanged(editor)
     });
 
@@ -652,8 +711,8 @@ export async function openTab(path, content, extension, name, pathContext, isNew
         updateEditorData()
     });
 
-    editor.on("click", () => {
-        setEditorContext()
+    editor.on("click", async () => {
+        await setEditorContext()
     });
 
     editor.session.on('changeAnnotation', function () {

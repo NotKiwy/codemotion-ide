@@ -487,6 +487,7 @@ export function addRuntimeError({ msg, line = null, col = null, time = null, isN
         e => e.msg === msg && e.line === line && e.col === col
     )
 
+    const wrapper = BottomWindow.get("errorsHistory")
     const badge = document.querySelector("#runtimeErrors .badge")
     const el = document.createElement("div")
     const items = document.querySelectorAll(".runtime-item#runTimeErrorItem")
@@ -537,7 +538,25 @@ export function addRuntimeError({ msg, line = null, col = null, time = null, isN
         runtimeErrorsCount = 0
     }
 
-    BottomWindow.get("errorsHistory").add(el)
+    wrapper.add(el)
+
+    wrapper.win.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+export function clearRuntimeErrors() {
+    runtimeErrors = []
+    runtimeErrorsCount = 0
+
+    const items = document.querySelectorAll(".runtime-item#runTimeErrorItem")
+    items.forEach(i => {
+        console.log(i)
+    })
+
+    addRuntimeError(
+        {
+            isNull: true,
+            time: Math.floor(Date.now() / 1000)
+        }
+    )
 }
 
 export function formatUnix(ts) {

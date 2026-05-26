@@ -18,6 +18,7 @@
         "error-stack-parser": "^2.1.4",
         "flashot": "^1.4.1",
         "node-global-key-listener": "^0.3.0",
+        "typescript": "^6.0.3",
         "ws": "^8.19.0"
     }
 }

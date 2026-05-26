@@ -39,6 +39,10 @@ require("./helpers/getPython.js")
 require("./app/auth.js")
 require("./app/electron/live-server.js")
 require("./app/runtime/runtimeHandler.js")
+require("./app/tools/diagnostics.js")
+require("./app/tools/javascript/ast.js")
+require("./app/tools/typescript/ast.js")
+
 const { terminalManager } = require("./app/helpers/terminal.js")
 
 const { createDebuggerWindow } = require("./helpers/debuggerWindow/debuggerWindow.js");
