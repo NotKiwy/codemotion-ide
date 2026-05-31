@@ -20,7 +20,7 @@ import { getCurrentUserDataFromAPI } from "../assets/js/user.js"
 
 import * as object from "../assets/js/objects.js"
 
-import { openTab, reopenLastClosed, activateTab, recentlyClosed, tabsByPath, currentPath, updateTabPath } from "../assets/components/tabHandler.js"
+import { openTab, reopenLastClosed, activateTab, recentlyClosed, tabsByPath, currentPath, updateTabPath } from "../assets/js/explorerTree/tabHandler.js"
 import { handlePopovers } from "../assets/js/handlers/handlePopovers.js"
 import { initExtensions } from "../assets/js/extensionsHandler/extensionsHandler.js"
 import { sendDebugMsg } from "../assets/js/handlers/debuggerSignalHandlers.js"
@@ -29,7 +29,7 @@ import { initActions } from "../assets/js/actions.js"
 import { handleHistoryTab } from "../assets/js/explorerTabsHandlers/history.js"
 import { handleBugsTab } from "../assets/js/explorerTabsHandlers/bugs.js"
 import { electronAPI, getDirname, readSettings } from "../assets/js/global.js"
-import { closeAllTabs } from "../assets/components/tabHandler.js"
+import { closeAllTabs } from "../assets/js/explorerTree/tabHandler.js"
 
 import { handleSettings } from "../assets/js/settings.js"
 import { SidebarResizeHandler } from "../assets/js/handlers/SidebarResizeHandler.js"

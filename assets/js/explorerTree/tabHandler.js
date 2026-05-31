@@ -16,10 +16,10 @@ import {
     loadAceModule,
     loadAceModuleAsync,
     showCodeWindowVisuals
-} from "../js/lib.js"
-import { BottomWindow, closeAllWindows } from "../js/handlers/BottomWindowHandler.js"
-import { initJSSH } from "../../ace/plugins/languageSyntaxEnhance.js"
-import { enableSmoothScroll } from "../plugins/aceSmoothScroller/index.js"
+} from "../lib.js"
+import { BottomWindow, closeAllWindows } from "../handlers/BottomWindowHandler.js"
+import { initJSSH } from "../../../ace/plugins/languageSyntaxEnhance.js"
+import { enableSmoothScroll } from "../../plugins/aceSmoothScroller/index.js"
 import {
     setCurrentLanguage,
     setColumn,
@@ -30,21 +30,21 @@ import {
     setLine,
     enableErrors,
     disableErrors
-} from "../js/handlers/bottomTabHandler.js"
-import { Console } from "../js/handlers/terminalHandler.js"
-import { minifyJS, minifyCSS } from "../js/handlers/minifyHandlers.js"
-import { initCodeContextMenu, destroyCodeContextMenu } from "./codeContextMenu.js"
-import { enableSave, disableSave } from "../../app/renderer.js"
-import { bus, sendEvent } from "../js/bus.js"
-import { ColorComments } from "../../app/main/helpers/ace/colorComments.js"
+} from "../handlers/bottomTabHandler.js"
+import { Console } from "../handlers/terminalHandler.js"
+import { minifyJS, minifyCSS } from "../handlers/minifyHandlers.js"
+import { initCodeContextMenu, destroyCodeContextMenu } from "../codeContextMenu.js"
+import { enableSave, disableSave } from "../../../app/renderer.js"
+import { bus, sendEvent } from "../bus.js"
+import { ColorComments } from "../../../app/main/helpers/ace/colorComments.js"
 
-import { renderPyMsgSuccess, renderPyMsgErr } from "./pythonRuntime/runtimeHandler.js"
+import { renderPyMsgSuccess, renderPyMsgErr } from "../terminalRenderer/PyRuntimeHandler.js"
 
-import { TypescriptParser } from "../js/contextParsers/typescriptParser.js"
-import { JavascriptParser } from "../js/contextParsers/javascriptParser.js"
-import { JSONParser } from "../js/contextParsers/jsonParser.js"
-import { HTMLParser } from "../js/contextParsers/htmlParser.js"
-import { CSSParser } from "../js/contextParsers/cssParser.js"
+import { TypescriptParser } from "../contextParsers/typescriptParser.js"
+import { JavascriptParser } from "../contextParsers/javascriptParser.js"
+import { JSONParser } from "../contextParsers/jsonParser.js"
+import { HTMLParser } from "../contextParsers/htmlParser.js"
+import { CSSParser } from "../contextParsers/cssParser.js"
 
 export const recentlyClosed = new Map();
 export const tabsByPath = new Map();

@@ -9,9 +9,9 @@ import {
     showErrBlock,
     getFormLabel,
     initInputs
-} from "../components/authRenderer.js"
+} from "./authRenderer.js"
 
-import { GLS } from "./lib.js"
+import { GLS } from "../lib.js"
 
 document.addEventListener("DOMContentLoaded", async () => {
     const gls = await GLS.init()

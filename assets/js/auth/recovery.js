@@ -16,9 +16,9 @@ import {
     showEl,
     disableEl,
     unDisableEl
-} from "../components/authRenderer.js"
+} from "./authRenderer.js"
 
-import { createNotify, GLS, secondsToMinutes } from "./lib.js"
+import { createNotify, GLS, secondsToMinutes } from "../lib.js"
 
 const submitBtnID = "recoverySubmitBtn"
 

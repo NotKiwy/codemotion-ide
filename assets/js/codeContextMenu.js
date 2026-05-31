@@ -1,6 +1,5 @@
-import { ContextMenu } from "../js/handlers/contextMenuHandler.js"
-import { ExistingModal } from "./modalHandler.js"
-import { normalizePath, parseTwemojiString, copyText } from "../js/lib.js"
+import { ContextMenu } from "./handlers/contextMenuHandler.js"
+import { normalizePath, parseTwemojiString, copyText } from "./lib.js"
 
 function isPathCommentIsCurrent(currentPath, commentPath) {
     currentPath = normalizePath(currentPath)

@@ -1,7 +1,7 @@
-import { closeAllTabs } from "../../../components/tabHandler.js";
+import { closeAllTabs } from "../tabHandler.js";
 import { buildTreeHtml, renderNodes } from "../render.js";
 import { bindFileClicks } from "./bindFileClicksHandler.js";
-import { tabsByPath, recentlyClosed } from "../../../components/tabHandler.js";
+import { tabsByPath, recentlyClosed } from "../tabHandler.js";
 import { initializeExplorerContextMenu } from "./contextMenuHandler.js";
 
 async function setProjectDataUsedLanguages(path) {

@@ -1,5 +1,4 @@
 import { generateAvatar, truncateString, GLOBAL } from "./lib.js";
-import { ExistingModal, modalVerifiedBadgeHTML, modalOwnerBadgeHTML } from "../components/modalHandler.js";
 import { Modal } from "./modalsHandler/engine.js";
 
 import { spawnSideBarOrganizationsButton } from "./userHandlers/spawn.js"
