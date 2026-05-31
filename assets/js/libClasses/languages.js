@@ -109,7 +109,7 @@ export class _Languages {
         },
         txt: {
             name: "Text",
-            icon: "txt",
+            icon: "default",
             iconExt: "svg",
             mode: "text",
             color: "#9aa0a6"
@@ -309,6 +309,13 @@ export class _Languages {
             iconExt: "svg",
             mode: "lua",
             color: "#000080"
+        },
+        go: {
+            name: "GO",
+            icon: "go",
+            iconExt: "svg",
+            mode: "golang",
+            color: "#00ACD7"
         }
     }
     
@@ -358,7 +365,7 @@ export class _Languages {
             return this.languages[name]
         }
         else {
-            console.warn(`[Language] The language "${name}" was not found in the list of languages. Using default`)
+            // console.warn(`[Language] The language "${name}" was not found in the list of languages. Using default`)
             return this.languages.default
         }
     }
@@ -381,12 +388,12 @@ export class _Languages {
                 return fileName
             }
             else {
-                console.warn(`[Language] The language icon "${fileName}" was not found in the list of icons: ${allLanguageIcons.join(", ")}`)
+                // console.warn(`[Language] The language icon "${fileName}" was not found in the list of icons: ${allLanguageIcons.join(", ")}`)
                 return fileName
             }
         }
         else {
-            console.warn(`[Language] The language "${name}" was not found in the list of languages. Using default`)
+            // console.warn(`[Language] The language "${name}" was not found in the list of languages. Using default`)
             return `${this.languages.default.icon}.${this.languages.default.iconExt}`
         }
     }
