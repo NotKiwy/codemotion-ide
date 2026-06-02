@@ -37,7 +37,9 @@ import { minifyJS, minifyCSS } from "../handlers/minifyHandlers.js"
 import { initCodeContextMenu, destroyCodeContextMenu } from "../codeContextMenu.js"
 import { enableSave, disableSave } from "../../../app/renderer.js"
 import { bus, sendEvent } from "../bus.js"
-import { ColorComments } from "../../../app/main/helpers/ace/colorComments.js"
+
+import { FindNoUsages } from "../editor/noUsagesFinder.js"
+import { ColorComments } from "../editor/colorComments.js"
 
 import { renderPyMsgSuccess, renderPyMsgErr } from "../terminalRenderer/PyRuntimeHandler.js"
 
@@ -704,6 +706,10 @@ export async function openTab(path, content, extension, name, pathContext, isNew
         updateEditorData()
         await setEditorContext()
         triggerAceChanged(editor)
+
+        // unused find
+
+        FindNoUsages.install(editor)
     });
 
     editor.selection.on("changeCursor", triggerCursorChanged)

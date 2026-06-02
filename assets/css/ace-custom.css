@@ -245,3 +245,8 @@
     background: unset;
     border-right: 1px solid var(--context-border);
 }
+
+.ace_no_usage {
+    opacity: .5;
+    text-decoration: underline wavy #888;
+}
