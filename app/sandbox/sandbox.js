@@ -166,7 +166,7 @@ ipcMain.handle("run-extension", async (event, code, permissions, meta) => {
     let allCSSVariables = meta.allCSSVariables != undefined ? meta.allCSSVariables : []
 
     function createAPI(permissions) {
-        const APP = {
+        const app = {
             name: extensionName,
             permissions: permissions,
             version: extensionVersion,
@@ -175,44 +175,67 @@ ipcMain.handle("run-extension", async (event, code, permissions, meta) => {
             CSSVariables: allCSSVariables
         };
 
-        permissions.forEach(p => {
-            if(p.startsWith("app.")) {
-                let appPermissionName = p.split("app.")[1].trim()
+        function setNestedProperty(obj, path, value) {
+            const parts = path.split(".")
 
-                if (fs.existsSync(path.join(APP_PATH, "sandbox", "permissions", appPermissionName + ".js"))) {
-                    const { callback } = require(`./permissions/${appPermissionName}.js`)
+            let current = obj
+
+            for(let i = 0; i < parts.length - 1; i++) {
+                const part = parts[i]
+
+                if(!current[part]) {
+                    current[part] = {}
+                }
+
+                current = current[part]
+            }
+
+            current[parts.at(-1)] = value
+        }
+
+        permissions.forEach(p => {
+            const checkRegex = /^[A-Za-z]+(?:\.[A-Za-z]+)+$/gm
+
+            if(checkRegex.test(p)) {
+                let appPermissionFile = p.replaceAll(".", "/")
+
+                if (fs.existsSync(path.join(APP_PATH, "sandbox", "permissions", appPermissionFile + ".js"))) {
+                    const { callback } = require(`./permissions/${appPermissionFile}.js`)
 
                     debuggerSender = debuggerSender ?? mainSender
 
-                    APP[appPermissionName] = (...args) => {
-                        return callback(
-                            {
-                                debuggerSender: debuggerSender,
-                                mainSender: mainSender,
-                                extensionName: extensionName,
-                                extensionPath: extensionPath,
-                                allCSSVariables: allCSSVariables,
-                                selfArgs: args
-                            }
-                        )
-                    }
+                    setNestedProperty(app, p, (...args) => {
+                        const factory = callback({
+                            debuggerSender,
+                            mainSender,
+                            extensionName,
+                            extensionPath,
+                            permissionName: "app." + p,
+                            allCSSVariables,
+                            selfArgs: args
+                        })
+
+                        if (factory && typeof factory === "function") {
+                            return factory(...args);
+                        }
+                    })
                 }
                 else {
-                    throw new Error(`Permission "app.${appPermissionName}" is not exists`)
+                    throw new Error(`Permission "${p}" is not exists`)
                 }
             }
         })
 
-        return Object.freeze(APP);
+        return Object.freeze(app);
     }
 
     try {
-        let APP = createAPI(permissions);
+        let app = createAPI(permissions);
 
         const sandbox = {
             console: createSandboxConsole(extensionName, debuggerSender),
             Map: Map,
-            APP
+            app
         };
 
         const context = vm.createContext(sandbox);
@@ -245,7 +268,7 @@ ipcMain.handle("run-extension", async (event, code, permissions, meta) => {
 
         return { 
             success: false,
-            error: `\n${message}`
+            error: String(err)
         };
     }
 });

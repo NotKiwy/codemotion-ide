@@ -3,6 +3,6 @@
     "displayName": "Google Design",
     "description": "Allow to create Google-like themes",
     "version": "1.0.0",
-    "execFile": "index",
-    "permissions": ["app.registerTheme", "app.loadCSS"]
+    "main": "index",
+    "permissions": []
 }

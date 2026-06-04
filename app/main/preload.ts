@@ -120,18 +120,45 @@ contextBridge.exposeInMainWorld('electron', {
 
     // for extensions
 
+    ext: {
+        ui: {
+            theme: {
+                onRegister: (callback: any) => 
+                    ipcRenderer.on("new-theme-register", (event: string, name: string, data: any) => callback(name, data)),
+            },
+            css: {
+                onLoad: (callback: any) => 
+                    ipcRenderer.on("load-css", (event: any, name: any, content: any) => callback(name, content)),
+            },
+        },
+        editor: {
+            language: {
+                onRegister: (callback: any) => 
+                    ipcRenderer.on("new-language-register", (event: any, data: any) => callback(data)),
+                onIconsRegister: (callback: any) => 
+                    ipcRenderer.on("new-language-icons-register", (event: any, data: any) => callback(data)),
+                onChangeHLRules: (callback: any) => 
+                    ipcRenderer.on("on-editor-change-new-hl-rules", (event: any, data: any) => callback(data)),
+            },
+            dir: {
+                onIconsRegister: (callback: any) => 
+                    ipcRenderer.on("new-dir-icon-register", (event: any, data: any) => callback(data)),
+            },
+            docs: {
+                onRegister: (callback: any) => 
+                    ipcRenderer.on("new-documentation-register", (event: any, data: any) => callback(data)),
+            }
+        },
+        app: {
+            onNotification: (callback: any) => 
+                ipcRenderer.on("extension-notification", (event: any, name: any, data: any) => callback(name, data)),
+            onLog: (callback: any) => 
+                ipcRenderer.on("extension-log", (event: any, data: any) => callback(data)),
+        }
+    },
+
     runExtension: (code: string, permissions: object, meta: object) => ipcRenderer.invoke("run-extension", code, permissions, meta),
-    onThemeRegister: (callback: any) => ipcRenderer.on("new-theme-register", (event: string, name: string, data: any) => callback(name, data)),
-    onLanguageRegister: (callback: any) => ipcRenderer.on("new-language-register", (event: any, data: any) => callback(data)),
-    onLoadCSS: (callback: any) => ipcRenderer.on("load-css", (event: any, name: any, content: any) => callback(name, content)),
-    onNewLanguageIconsRegister: (callback: any) => ipcRenderer.on("new-language-icons-register", (event: any, data: any) => callback(data)),
-    onNewDirIconRegister: (callback: any) => ipcRenderer.on("new-dir-icon-register", (event: any, data: any) => callback(data)),
-    onNewDocumentationTypesRegister: (callback: any) => ipcRenderer.on("new-documentation-types-register", (event: any, data: any) => callback(data)),
-    onExtLog: (callback: any) => ipcRenderer.on("extension-log", (event: any, data: any) => callback(data)),
-    onNotification: (callback: any) => ipcRenderer.on("extension-notification", (event: any, name: any, data: any) => callback(name, data)),
-
-    onEditorChangeNewHLRules: (callback: any) => ipcRenderer.on("on-editor-change-new-hl-rules", (event: any, data: any) => callback(data)),
-
+    
     onCustomLanguageRegistration: () => {
         return new Promise((resolve) => {
             if (isRegisteredCustomLanguageRegistration) {
@@ -145,7 +172,6 @@ contextBridge.exposeInMainWorld('electron', {
             })
         })
     },
-
     sendCustomLanguageRegistrationReady: () => {
         ipcRenderer.send("custom-language-registration-ready")
     },

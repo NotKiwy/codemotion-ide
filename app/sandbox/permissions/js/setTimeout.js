@@ -3,7 +3,7 @@ function callback(data) {
     const delay = Number(data.selfArgs[1])
 
     if (typeof cb !== "function") {
-        throw new Error("[APP.setTimeout] First argument must be a function")
+        throw new Error(`[${data.permissionName}] First argument must be a function`)
     }
 
     return setTimeout(cb, Number.isFinite(delay) ? delay : 0)

@@ -43,10 +43,24 @@ export class TopWindowList {
                 itemElement.classList.add("top-window__list-item")
 
                 const nameElement = document.createElement("div")
+                const nameWrapper = document.createElement("div")
+
+                nameWrapper.classList.add("top-window__list-item__name-wrapper")
 
                 if ("name" in item) {
                     nameElement.classList.add("top-window__list-item__name")
-                    nameElement.textContent = item.name
+                    const nameElementSpan = document.createElement("span")
+                    nameElementSpan.textContent = item.name
+
+                    nameElement.appendChild(nameElementSpan)
+                }
+
+                if ("secondary" in item) {
+                    const secondaryElementSpawn = document.createElement("span")
+                    secondaryElementSpawn.textContent = item.secondary
+                    secondaryElementSpawn.classList.add("secondary")
+
+                    nameElement.appendChild(secondaryElementSpawn)
                 }
 
                 if ("id" in item) {
@@ -57,10 +71,11 @@ export class TopWindowList {
                     const iconEl = document.createElement("img")
                     iconEl.src = item.icon
 
-                    nameElement.prepend(iconEl)
+                    nameWrapper.prepend(iconEl)
                 }
 
-                itemElement.appendChild(nameElement)
+                nameWrapper.appendChild(nameElement)
+                itemElement.appendChild(nameWrapper)
 
                 itemElement.addEventListener("click", () => {
                     this.hide()

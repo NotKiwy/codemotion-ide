@@ -1,11 +1,9 @@
-const { checkFields } = require("../tools.js")
+const { checkFields } = require("../../tools.js")
 
 function callback(data) {
     const themeName = data.selfArgs[0]
     const themeData = data.selfArgs[1]
     const extName = data.extensionName
-
-    data.mainSender.send("extension-log", data.extensionName, "Hello world")
 
     let allCSSVariables = data.allCSSVariables
 
@@ -36,17 +34,17 @@ function callback(data) {
 
     data.mainSender.send("new-theme-register", themeName, themeData)
 
-    // data.debuggerSender.send("debug-event", {
-    //     data: {
-    //         type: "newCommand",
-    //         command: {
-    //             name: "CSSVariables",
-    //             response: `A list of current CSS variables will be displayed below. The format is "name:value":\n${allCSSVariables.join(", \n")}`
-    //         },
-    //         from: extName
-    //     },
-    //     time: Date.now()
-    // })
+    data.debuggerSender.send("debug-event", {
+        data: {
+            type: "newCommand",
+            command: {
+                name: "CSSVariables",
+                response: `A list of current CSS variables will be displayed below. The format is "name:value":\n${allCSSVariables.join(", \n")}`
+            },
+            from: extName
+        },
+        time: Date.now()
+    })
 }
 
 module.exports = { callback }

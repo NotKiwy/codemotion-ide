@@ -1,5 +1,5 @@
 const { app } = require("electron")
-const { checkFields, saveReadFile, isFileExists } = require("../tools.js")
+const { checkFields, saveReadFile, isFileExists } = require("../../../tools.js")
 const path = require("path")
 
 function callback(data) {
@@ -11,7 +11,7 @@ function callback(data) {
         let configContent = saveReadFile(path.join(extPath, configPath + ".json"), true)
         configContent = JSON.parse(configContent)
 
-        checkFields("APP.registerLanguage:config", configContent, {
+        checkFields(`${data.permissionName}:config`, configContent, {
             name: "string",
             displayName: "string",
             extensions: "array",
@@ -21,7 +21,7 @@ function callback(data) {
         let rulesConfig = saveReadFile(path.join(extPath, configContent.rules + ".json"), true)
         rulesConfig = JSON.parse(rulesConfig)
 
-        checkFields("APP.registerLanguage:config:rules", rulesConfig, {
+        checkFields(`${data.permissionName}:config:rules`, rulesConfig, {
             syntax: "object",
             autocomplete: "object"
         })
@@ -30,7 +30,7 @@ function callback(data) {
         const defaultIcon = path.join(app.getAppPath(), "assets", "media", "icons", "default.svg")
 
         if ("icon" in configContent) {
-            checkFields("APP.registerLanguage:config", configContent, {
+            checkFields(`${data.permissionName}:config`, configContent, {
                 icon: "SVGFile|PNGFile"
             })
 
@@ -77,7 +77,7 @@ function callback(data) {
         })
     }
     else {
-        throw new Error(`[APP.registerLanguage] You must specify the configuration for language registration`)
+        throw new Error(`[${data.permissionName}] You must specify the configuration for language registration`)
     }
 }
 

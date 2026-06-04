@@ -1,4 +1,4 @@
-const { checkFields } = require("../tools.js")
+const { checkFields } = require("../../tools.js")
 
 function callback(data) {
     const input = data.selfArgs[0]

@@ -8,15 +8,18 @@ export async function setCurrentLanguage(langName, properties = {}) {
 
     const aviableLanguageNames = []
 
-    const languages = Object.values(Languages.list())
-        .filter(lang => !["Image", "Font", "To-Do List", "GIT File"].includes(lang.name))
+    const languages = Object.entries(Languages.list())
+        .filter(([_, lang]) =>
+            !["Image", "Font", "To-Do List", "GIT File"].includes(lang.name)
+        )
 
-    for (const lang of languages) {
-        const icon = await Languages.getIconPath(lang.icon)
+    for (const [key, lang] of languages) {
+        const icon = await Languages.getIconPath(key)
 
         aviableLanguageNames.push({
             name: lang.name,
             id: lang.mode,
+            secondary: key,
             icon
         })
     }

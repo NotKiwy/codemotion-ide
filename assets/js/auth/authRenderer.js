@@ -1,4 +1,4 @@
-import { GLS } from "../js/lib.js"
+import { GLS } from "../lib.js"
 
 export let inputs = document.querySelectorAll("input")
 export let submitBtn = document.querySelector(".form-submit")

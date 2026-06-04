@@ -26,13 +26,21 @@
     cursor: pointer;
 }
 
-.top-window.list .top-window__list-item .top-window__list-item__name img {
+.top-window.list .top-window__list-item img {
     width: 14px;
     height: 14px;
     object-fit: cover;
 }
 .top-window.list .top-window__list-item .top-window__list-item__name {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+.top-window.list .top-window__list-item .top-window__list-item__name-wrapper {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+.top-window.list .top-window__list-item .top-window__list-item__name-wrapper .secondary {
+    opacity: .5;
 }

@@ -67,6 +67,10 @@ export class _Dirs {
         icons: {
             icon: "svg",
             iconExt: "svg"
+        },
+        temp: {
+            icon: "temp",
+            iconExt: "svg"
         }
     }
 

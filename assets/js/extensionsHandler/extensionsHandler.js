@@ -10,7 +10,7 @@ function checkPackage(object) {
         return { success: false, msg: "File missing or empty" }
     }
 
-    const requireFields = ["version", "name", "displayName", "execFile", "dependencies", "permissions", "description"]
+    const requireFields = ["version", "name", "displayName", "main", "dependencies", "permissions", "description"]
 
     for (const f of requireFields) {
         if (!(f in object)) {
@@ -26,7 +26,7 @@ function checkModulePackage(object) {
         return { success: false, msg: "File missing or empty" }
     }
 
-    const requireFields = ["version", "name", "displayName", "description", "execFile", "permissions"]
+    const requireFields = ["version", "name", "displayName", "description", "main", "permissions"]
 
     for (const f of requireFields) {
         if (!(f in object)) {
@@ -85,7 +85,7 @@ export async function initExtensions() {
         let icon = extensionPackage.icon != undefined ? extensionPackage.icon : false
         let description = extensionPackage.description
         let displayName = extensionPackage.displayName
-        let execFile = extensionPackage.execFile
+        let main = extensionPackage.main
         let dependencies = extensionPackage.dependencies || {}
         let permissions = extensionPackage.permissions || []
 
@@ -93,16 +93,16 @@ export async function initExtensions() {
 
         permissions.forEach(p => allPermissions.add(p))
 
-        let extensionExecFileContent = await window.electron.readFile(`/extensions/${name}/${execFile}.js`)
+        let extensionmainContent = await window.electron.readFile(`/extensions/${name}/${main}.js`)
 
-        if (!extensionExecFileContent.success) {
-            notifyError({ name: displayName, content: extensionExecFileContent.result })
+        if (!extensionmainContent.success) {
+            notifyError({ name: displayName, content: extensionmainContent.result })
             continue
         }
 
-        sendDebugMsg(`(Extension) ${name}: ${execFile}.js loaded`)
+        sendDebugMsg(`(Extension) ${name}: ${main}.js loaded`)
 
-        extensionExecFileContent = extensionExecFileContent.result
+        extensionmainContent = extensionmainContent.result
 
         createNotify({
             type: "success",
@@ -134,20 +134,20 @@ export async function initExtensions() {
                 name: moduleName,
                 version: moduleVersion,
                 description: moduleDescription,
-                execFile: moduleExecFile,
+                main: modulemain,
                 permissions: modulePermissions = []
             } = depPackage
 
             modulePermissions.forEach(p => allPermissions.add(p))
 
-            let moduleExecFileContent = await window.electron.readFile(`/extension_modules/${depName}/${moduleVersion}/${moduleExecFile}.js`)
+            let modulemainContent = await window.electron.readFile(`/extension_modules/${depName}/${moduleVersion}/${modulemain}.js`)
 
-            if (!moduleExecFileContent.success) {
-                sendDebugError(`(Extension) ${name}: Module "${depName}" (v${depVersion}) execFile "${moduleExecFile}.js" failed to load. ${moduleExecFileContent.result}`)
+            if (!modulemainContent.success) {
+                sendDebugError(`(Extension) ${name}: Module "${depName}" (v${depVersion}) main "${modulemain}.js" failed to load. ${modulemainContent.result}`)
                 continue
             }
 
-            moduleExecFileContent = moduleExecFileContent.result
+            modulemainContent = modulemainContent.result
 
             sendDebugMsg(`(Extension) ${name}: Loaded module "${depName}" (v${moduleVersion})\nPermissions: ${modulePermissions.join(", ")}`)
             sendDebugModuleInfo({
@@ -157,10 +157,10 @@ export async function initExtensions() {
                 permissions: modulePermissions
             })
 
-            extensionFinalContent += moduleExecFileContent + "\n"
+            extensionFinalContent += modulemainContent + "\n"
         }
 
-        extensionFinalContent += extensionExecFileContent
+        extensionFinalContent += extensionmainContent
 
         const permissionsArray = [...allPermissions]
         

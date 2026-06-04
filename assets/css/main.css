@@ -2,6 +2,7 @@
 @import url("./window/topWindowList.css");
 @import url("components/codeWrapper.css");
 @import url("auth.css");
+@import url("xterm-custom.css");
 
 :root {
     --body-color: #141414;

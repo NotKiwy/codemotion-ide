@@ -1,4 +1,4 @@
-const { checkFields, saveReadFile } = require("../tools.js")
+const { checkFields, saveReadFile } = require("../../../../tools.js")
 const path = require("path")
 
 function callback(data) {
@@ -11,7 +11,7 @@ function callback(data) {
 
         if (configContent.length > 0) {
             Object.keys(configContent).forEach((item, index) => {
-                checkFields(`APP.registerDocumentationTypes:config:${index}`, configContent[item], {
+                checkFields(`${data.permissionName}:config:${index}`, configContent[item], {
                     type: "string",
                     displayName: "string",
                     color: "HEX|RGB"

@@ -1,4 +1,5 @@
 const { app, ipcMain } = require("electron")
+const { addRule, removeRule } = require("./hl/getRules")
 
 function callback(data) {
     const activeRules = new Set()
@@ -21,36 +22,12 @@ function callback(data) {
                         column: 1
                     },
                     hl: {
-                        addRule: addRule,
-                        removeRule: removeRule
+                        addRule: (...args) => addRule({ mainSender: mainSender }, ...args),
+                        removeRule: (...args) => removeRule({ mainSender: mainSender }, ...args)
                     }
                 }
             )
         })
-    }
-
-    function addRule(id, object = {}) {
-        if (activeRules.has(id)) return
-
-        if (!object || typeof object !== "object" || Array.isArray(object)) {
-            return
-        }
-
-        const data = {}
-        data["action"] = "add"
-        data["id"] = id
-        data["rule"] = object
-
-        mainSender.send("on-editor-change-new-hl-rules", data)
-    }
-    function removeRule(id) {
-        if (activeRules.has(id)) return
-
-        const data = {}
-        data["action"] = "add"
-        data["id"] = id
-
-        mainSender.send("on-editor-change-new-hl-rules", data)
     }
 }
 
