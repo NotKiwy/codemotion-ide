@@ -50,6 +50,7 @@ import { JSONParser } from "../contextParsers/jsonParser.js"
 import { HTMLParser } from "../contextParsers/htmlParser.js"
 import { CSSParser } from "../contextParsers/cssParser.js"
 import { triggerAceChanged, triggerAceClicked } from "./triggers.js"
+import { TopWindowList, destroyAllTopWindowLists } from "../topWindowHandler/topWindowList.js"
 
 export const recentlyClosed = new Map();
 export const tabsByPath = new Map();
@@ -411,25 +412,50 @@ function initializeGlobalButtons(settings = {}) {
     globalButtonsInitialized.set("initialized", true);
 }
 
-function initializeChangeTabSizeButton() {
-    const cycleStates = [2, 4, 8];
-    let currentIndex = 0;
+function initializeChangeTabSizeButton(settings) {
+    let currentTabSize = 2;
 
-    const handleChangeTabSize = () => {
+    if(settings.editor.tabSize != undefined && settings.editor.tabSize.length != 0) {
+        currentTabSize = settings.editor.tabSize
+    }
+
+    const el = document.querySelector("#changeTabSize")
+
+    function set(size) {
         if (!currentPath) return;
         const rec = tabsByPath.get(currentPath);
         if (!rec) return;
 
-        currentIndex = (currentIndex + 1) % cycleStates.length
-        rec.editor.session.setTabSize(cycleStates[currentIndex])
-        setTabSize(cycleStates[currentIndex])
+        rec.editor.session.setTabSize(size)
+        setTabSize(size)
     }
 
-    const changeTabSizeBtn = document.querySelector("#changeTabSize");
-    if (changeTabSizeBtn && !changeTabSizeBtn.hasTabSizeListener) {
-        changeTabSizeBtn.addEventListener("click", handleChangeTabSize);
-        changeTabSizeBtn.hasTabSizeListener = true;
-    }
+    setTimeout(() => {
+        set(currentTabSize)
+    }, 100)
+
+    const changeTabSizeList = new TopWindowList("changeTabSizeWindow",
+        [
+            {
+                name: "2 Tabs",
+                id: 2
+            },
+            {
+                name: "4 Tabs",
+                id: 4
+            },
+            {
+                name: "8 Tabs",
+                id: 8
+            }
+        ]
+    )
+
+    changeTabSizeList.on("click", (d) => {
+        set(d.id)
+    })
+
+    changeTabSizeList.bind(el)
 }
 
 function updateVisibleOnElements(extension, language) {
@@ -523,7 +549,7 @@ export async function openTab(path, content, extension, name, pathContext, isNew
     codeContextMenuPerTab.set(path, true)
 
     initializeGlobalButtons(settings)
-    initializeChangeTabSizeButton()
+    initializeChangeTabSizeButton(settings)
     updateVisibleOnElements(extension, language)
 
     editor.session.setMode(`ace/mode/${fileNameInfo == false ? language.mode : fileNameInfo.mode}`);

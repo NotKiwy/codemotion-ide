@@ -21,6 +21,9 @@ const contexts = {}
 let currentEditor = null
 
 export function handleExtensionEvents() {
+    const audioProvider = new Audio()
+    audioProvider.preload = "auto"
+
     extapi.app.onLog((name, text) => {
         console.log(`[LOG FROM "${name}"] ${text}`)
     })
@@ -47,6 +50,23 @@ export function handleExtensionEvents() {
     })
     extapi.app.onNotification((name, data) => {
         onNotificationCallback({ data: data, name: name })
+    })
+    extapi.app.onAudioPlay(data => {
+        const path = data.path
+        let volume = data.volume
+        let speed = data.speed
+        
+        audioProvider.src = path
+        audioProvider.load()
+
+        audioProvider.volume = volume
+        audioProvider.playbackRate = speed
+
+        audioProvider.addEventListener("loadedmetadata", () => {
+            if(audioProvider.duration < 31) {
+                audioProvider.play()
+            }
+        })
     })
 
     // dynamic editor change

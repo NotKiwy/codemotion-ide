@@ -2,8 +2,6 @@ import { Languages } from "../lib.js";
 import { TopWindowList, destroyAllTopWindowLists } from "../topWindowHandler/topWindowList.js";
 
 export async function setCurrentLanguage(langName, properties = {}) {
-    destroyAllTopWindowLists()
-
     if (!properties.editor) throw new Error(`properties.editor required`)
 
     const aviableLanguageNames = []

@@ -171,6 +171,11 @@ function getArgumentNames(func) {
     return getParamNames(func)
 }
 
+function getExt(filename) {
+    const ext = path.extname(filename)
+    return ext
+}
+
 module.exports = { 
     createNativeImageFromUrl, 
     getType, 
@@ -184,5 +189,6 @@ module.exports = {
     checkFields,
     createSandboxConsole,
     getArgumentNames,
-    log
+    log,
+    getExt
 }

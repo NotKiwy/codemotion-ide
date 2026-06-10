@@ -23,6 +23,8 @@ export class TopWindowList {
     constructor(id = null, list = {}) {
         id ??= `top-window-${++autoId}`
 
+        console.log(id)
+
         if (instances.has(id)) {
             return instances.get(id)
         }
@@ -100,10 +102,14 @@ export class TopWindowList {
 
         this.window.querySelectorAll(".top-window__list-item").forEach(e => {
             e.addEventListener("click", event => {
+                let target = event.target
+
+                if(target.tagName == "SPAN") target = target.parentElement
+
                 cb({
-                    target: event.target,
-                    id: event.target.id,
-                    name: event.target.textContent
+                    target: target,
+                    id: target.id,
+                    name: target.textContent
                 })
             })
         })

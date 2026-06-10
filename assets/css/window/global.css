@@ -8,7 +8,7 @@
     border: 1px solid var(--block-divider-border-color);
     z-index: 9999;
     width: 300px;
-    min-height: 100px;
+    min-height: 50px;
     border-radius: 10px;
 
     opacity: 1;
