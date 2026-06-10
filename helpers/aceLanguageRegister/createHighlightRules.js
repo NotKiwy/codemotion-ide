@@ -101,12 +101,12 @@ export function createHighlightRules(config = {}) {
         })
     }
 
-    if (config.uppercaseAsConstant) {
-        rules.push({
-            token: "constant.language",
-            regex: "(?<![A-Za-z0-9_])_*[A-Z][A-Z0-9_]*(?![A-Za-z0-9_])"
-        })
-    }
+    // if (config.uppercaseAsConstant) {
+    //     rules.push({
+    //         token: "constant.language",
+    //         regex: "(?<![A-Za-z0-9_])_*[A-Z][A-Z0-9_]*(?![A-Za-z0-9_])"
+    //     })
+    // }
 
     rules.push({
         token: function (value) {
