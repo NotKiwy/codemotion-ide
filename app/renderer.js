@@ -42,6 +42,7 @@ import { setupSegmentedControl } from "../assets/js/handlers/segmentedControlHan
 
 import { getAddBugModal } from "../assets/js/modals/addBugModal.js"
 import { getLogoutModal } from "../assets/js/modals/logoutModal.js"
+import { ExplorerSidebar } from "../assets/js/sidebar/ExplorerSidebar.js"
 
 let isSaveAviable = true
 
@@ -167,6 +168,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const createOrgPopupItem = document.querySelector(".popup-content__item#createOrganization")
     const topbarCenterUserData = document.querySelector(".topbar-center#userData")
     const topbarCenterBugsData = document.querySelector(".topbar-center#bugsData")
+
+    // explorer sidebar toggle handler
+
+    ExplorerSidebar.init()
+    ExplorerSidebar.bindEvent("showInSidebarItemClick")
+
+    document.querySelector("#sidebar-toggle").addEventListener("click", () => {
+        ExplorerSidebar.toggleWidth()
+    })
 
     // Main
 
@@ -371,9 +381,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     new SidebarResizeHandler({
-        explorer,
-        mainWrapper,
-        settings,
+        explorer: explorer,
+        mainWrapper: mainWrapper,
+        settings: settings,
         onResizeEnd: () => {
             tabsByPath.forEach((tab) => tab.editor?.resize?.())
         }

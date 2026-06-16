@@ -119,8 +119,6 @@ export async function initExtensions() {
 
         let extensionMainFileContentRes = await window.electron.readFile(`/${name}/${main}.js`, extensionsDir)
 
-        console.log("FileContent:", extensionMainFileContentRes)
-
         if (!extensionMainFileContentRes.success) {
             notifyError({ name: displayName, content: extensionMainFileContentRes.result })
             return

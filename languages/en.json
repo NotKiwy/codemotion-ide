@@ -119,6 +119,7 @@
         "htmlLiveServer": "Live Server",
         "errors": "Errors",
         "project": "Project data",
+        "sidebar": "Toggle sidebar",
 
         "codeSnippet": "Take screenshot",
         "copy": "Copy",

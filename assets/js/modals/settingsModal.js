@@ -100,7 +100,7 @@ export async function getSettingsModal({ platform }) {
                 content: [
                     {
                         type: "category",
-                        label: "Explorer",
+                        label: lgls("sideBarCategory"),
                         items: []
                     },
                     {
@@ -111,16 +111,9 @@ export async function getSettingsModal({ platform }) {
                                 type: "switch",
                                 title: "Show hidden files",
                                 description: "Displays files and folders starting with a dot (e.g. .gitignore)",
-                                id: "setting_explorerShowHidden",
+                                id: "setting_sidebarShowHiddenFiles",
                                 disabled: true
-                            },
-                            {
-                                type: "switch",
-                                title: "Compact mode",
-                                description: "Reduces padding in the file tree for a denser layout",
-                                id: "setting_explorerCompact",
-                                disabled: true
-                            },
+                            }
                         ]
                     }
                 ]

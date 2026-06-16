@@ -515,13 +515,18 @@ input~span {
     border-right: 1px solid var(--block-divider-border-color);
     overflow: hidden;
 }
+.explorer.zero-width {
+    --explorer-width: 0!important;
+    min-width: 0;
+    border-left: none;
+}
 .explorer.resizing {
     transition: none;
 }
 .explorer__resize-handle {
     position: absolute;
     top: 0;
-    right: -10px;
+    right: 0px;
     width: 8px;
     height: 100%;
     cursor: ew-resize;
@@ -1673,7 +1678,7 @@ body.explorer-resizing {
 .code-structure .context-item span[class^="material-symbols"].block-class {
     color: var(--color-class);
 }
-.code-footer.hidden .code-footer__section {
+.code-footer.hidden .code-footer__section .visible-after-opened-folder {
     display: none;
 }
 .code-footer .code-footer__section {
@@ -1696,6 +1701,19 @@ body.explorer-resizing {
 .code-footer .code-footer__section-btn span[class^="material-symbols"] {
     transform: translateY(2px);
     font-size: 14px;
+}
+.code-footer .code-footer__section .left-divider {
+    padding-left: 10px;
+    position: relative;
+}
+.code-footer .code-footer__section .left-divider::after {
+    content: '';
+    width: 1px;
+    height: 10px;
+    position: absolute;
+    background: var(--context-border);
+    left: 0;
+    top: 20%;
 }
 
 .notify-wrapper {

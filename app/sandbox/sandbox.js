@@ -118,6 +118,7 @@ ipcMain.handle("run-extension", async (event, code, permissions, meta) => {
     const extensionPath = meta.extensionPath != undefined ? meta.extensionPath : null
     const isDev = meta.isDev != undefined ? meta.isDev : false
     const activeOn = meta.activeOn
+    const isPackaged = app.isPackaged
 
     let allCSSVariables = meta.allCSSVariables != undefined ? meta.allCSSVariables : []
 
@@ -128,7 +129,8 @@ ipcMain.handle("run-extension", async (event, code, permissions, meta) => {
             version: extensionVersion,
             path: extensionPath,
             isDev: isDev,
-            CSSVariables: allCSSVariables
+            CSSVariables: allCSSVariables,
+            isPackaged: isPackaged
         };
 
         function setNestedProperty(obj, path, value) {
