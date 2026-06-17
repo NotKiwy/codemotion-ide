@@ -187,8 +187,8 @@ export async function getSettingsModal({ platform }) {
                         items: [
                             {
                                 type: "switch",
-                                title: "Colored tabs",
-                                description: "The bottom part of the active tab will glow in the color of the language",
+                                title: lgls("fileWindow.title"),
+                                description: lgls("fileWindow.description"),
                                 id: "setting_coloredTabs"
                             },
                             {

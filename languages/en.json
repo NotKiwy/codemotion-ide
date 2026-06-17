@@ -308,6 +308,11 @@
                         "userDefined": "User installed"
                     }
                 }
+            },
+
+            "fileWindow": {
+                "title": "Colored tabs",
+                "description": "The bottom part of the active tab will glow in the color of the language"
             }
         },
 
