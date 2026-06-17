@@ -107,13 +107,11 @@ export class TopWindowList {
 
                 if(target.tagName == "SPAN") target = target.parentElement
 
-                console.log(target)
-
                 cb({
                     target: target,
                     id: target.id,
                     name: target.querySelector(".name").textContent,
-                    secondary: target.querySelector(".secondary").textContent
+                    secondary: target.querySelector(".secondary") ? target.querySelector(".secondary").textContent : false
                 })
             })
         })
