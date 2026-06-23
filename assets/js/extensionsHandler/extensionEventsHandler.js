@@ -8,12 +8,13 @@ import { disableErrors, enableErrors } from "../handlers/bottomTabHandler.js"
 import { themeRegisterCallback } from "./events/ui/onThemeRegister.js"
 import { onLoadCSSCallback } from "./events/ui/onLoadCSS.js"
 import { onLanguageRegisterCallback } from "./events/editor/onLanguageRegister.js"
-import { onNewLanguageIconsRegisterCallback } from "./events/editor/onNewLanguageIconsRegister.js"
+import { onNewFileExtensionsRegister } from "./events/editor/onNewFileExtensionsRegister.js"
 import { onNewDirIconRegisterCallback } from "./events/editor/onNewDirIconRegister.js"
 import { onEditorChangeNewHLRulesCallback } from "./events/editor/onEditorChangeNewHLRules.js"
 import { onNotificationCallback } from "./events/app/onNotification.js"
 import { onNewDocumentationRegisterCallback } from "./events/editor/onNewDocumentationRegister.js"
 import { onLocalizationRegister } from "./events/app/onLocalizationRegister.js"
+import { onFilenamesRegister } from "./events/editor/onFilenamesRegister.js"
 
 const preloadapi = window.electron
 const extapi = preloadapi.ext
@@ -34,20 +35,23 @@ export function handleExtensionEvents() {
     extapi.ui.css.onLoad((id, content) => {
         onLoadCSSCallback({ id: id, content: content })
     })
-    extapi.editor.docs.onRegister((data) => {
+    extapi.editor.docs.onRegister(data => {
         onNewDocumentationRegisterCallback({ data: data })
     })
     extapi.editor.language.onRegister(async (data) => {
         onLanguageRegisterCallback({ data: data })
     })
-    extapi.editor.language.onIconsRegister((data) => {
-        onNewLanguageIconsRegisterCallback({ data: data })
-    })
-    extapi.editor.dir.onIconsRegister((data) => {
+    extapi.editor.dir.onIconsRegister(data => {
         onNewDirIconRegisterCallback({ data: data })
     })
-    extapi.editor.language.onChangeHLRules((data) => {
+    extapi.editor.language.onChangeHLRules(data => {
         onEditorChangeNewHLRulesCallback({ data: data, contexts: contexts, refreshEditorHighlight: refreshEditorHighlight })
+    })
+    extapi.editor.filenames.onRegister(data => {
+        onFilenamesRegister(data)
+    })
+    extapi.editor.fileExtensions.onRegister(data => {
+        onNewFileExtensionsRegister(data)
     })
     extapi.app.onNotification((name, data) => {
         onNotificationCallback({ data: data, name: name })

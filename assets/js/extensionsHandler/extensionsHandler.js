@@ -163,6 +163,32 @@ export async function initExtensions() {
                 )
             }
         }
+        if("filenames.register" in extensionPackage) {
+            const filenamesConfig = extensionPackage["filenames.register"]
+
+            if(filenamesConfig.length > 0) {
+                window.electron.ext.editor.filenames.register(
+                    {
+                        configPath: filenamesConfig,
+                        extensionPath: normalizePath(extensionPath),
+                        extensionName: name
+                    }
+                )
+            }
+        }
+        if("fileExtensions.register" in extensionPackage) {
+            const fileExtensionsConfig = extensionPackage["fileExtensions.register"]
+
+            if(fileExtensionsConfig.length > 0) {
+                window.electron.ext.editor.fileExtensions.register(
+                    {
+                        configPath: fileExtensionsConfig,
+                        extensionPath: normalizePath(extensionPath),
+                        extensionName: name
+                    }
+                )
+            }
+        }
         
         // 
         
@@ -220,7 +246,7 @@ export async function initExtensions() {
             sendDebugWarn(`Currently, the "${name}" extension and all modules connected to it use special permissions: <b>${permissionsArray.join(", ")}</b>`)
 
             if (!runResult.success) {
-                sendDebugError(`${name}: runtime error: ${runResult.error}`)
+                sendDebugError(`${name} runtime error: ${runResult.error}`)
             }
         }
     }

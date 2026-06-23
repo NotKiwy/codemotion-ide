@@ -36,6 +36,8 @@ require("./ipc/bugs")
 // ext
 require("../sandbox/regs/language")
 require("../sandbox/regs/docs")
+require("../sandbox/regs/filenames")
+require("../sandbox/regs/fileExtensions")
 
 console.log("APP PATH:", app.getAppPath());
 

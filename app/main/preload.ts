@@ -156,6 +156,18 @@ contextBridge.exposeInMainWorld('electron', {
                     ipcRenderer.send("docs-register", data),
                 onRegister: (callback: any) => 
                     ipcRenderer.on("new-documentation-register", (event: any, data: any) => callback(data)),
+            },
+            filenames: {
+                register: (data: any) =>
+                    ipcRenderer.send("filenames-register", data),
+                onRegister: (callback: any) =>
+                    ipcRenderer.on("new-filenames-register", (event: any, data: any) => callback(data)),
+            },
+            fileExtensions: {
+                register: (data: any) =>
+                    ipcRenderer.send("file-extensions-register", data),
+                onRegister: (callback: any) =>
+                    ipcRenderer.on("new-file-extensions-register", (event: any, data: any) => callback(data)),
             }
         },
         app: {

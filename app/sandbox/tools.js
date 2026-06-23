@@ -152,6 +152,7 @@ function createSandboxConsole(extensionName, debuggerSender) {
         },
         error: (...args) => {
             send("error", args);
+            throw new ExtensionError(args.join(", "))
         }
     };
 }
@@ -175,6 +176,13 @@ function getExt(filename) {
     return ext
 }
 
+class ExtensionError extends Error {
+    constructor(err) {
+        super(typeof err === "string" ? err : err?.message);
+        this.name = "ExtensionError";
+    }
+}
+
 module.exports = { 
     createNativeImageFromUrl, 
     getType, 
@@ -189,5 +197,7 @@ module.exports = {
     createSandboxConsole,
     getArgumentNames,
     log,
-    getExt
+    getExt,
+
+    ExtensionError
 }

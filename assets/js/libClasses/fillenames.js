@@ -30,6 +30,10 @@ export class _Filenames {
         }
     }
 
+    static add(name, properties) {
+        this.filenames[name] = properties
+    }
+
     static list() {
         return this.filenames
     }

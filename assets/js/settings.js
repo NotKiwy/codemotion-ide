@@ -370,8 +370,6 @@ export class Setting {
     static async language(value, set = true) {
         async function update() {
             const languageSelectGet = languageSelect.get(value)
-
-            console.log(languageSelect)
             
             if(languageSelectGet) {
                 languageSelectGet.default()
