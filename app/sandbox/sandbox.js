@@ -162,7 +162,7 @@ ipcMain.handle("run-extension", async (event, code, permissions, meta) => {
 
                     debuggerSender = debuggerSender ?? mainSender
 
-                    setNestedProperty(app, p, async (...args) => {
+                    setNestedProperty(app, p, (...args) => {
                         const factory = callback({
                             debuggerSender,
                             mainSender,
@@ -174,14 +174,7 @@ ipcMain.handle("run-extension", async (event, code, permissions, meta) => {
                             activeOn: activeOn
                         })
 
-                        if(factory instanceof Promise) {
-                            const awaitedFactory = await factory
-
-                            if(typeof awaitedFactory == "function") {
-                                return awaitedFactory(...args)
-                            }
-                        }
-                        else if (factory && typeof factory === "function") {
+                        if (factory && typeof factory === "function") {
                             return factory(...args);
                         }
                     })

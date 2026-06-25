@@ -15,6 +15,8 @@ import { onNotificationCallback } from "./events/app/onNotification.js"
 import { onNewDocumentationRegisterCallback } from "./events/editor/onNewDocumentationRegister.js"
 import { onLocalizationRegister } from "./events/app/onLocalizationRegister.js"
 import { onFilenamesRegister } from "./events/editor/onFilenamesRegister.js"
+import { onElementCreate } from "./events/ui/onElementCreate.js"
+import { onElementMod } from "./events/ui/onElementMod.js"
 
 const preloadapi = window.electron
 const extapi = preloadapi.ext
@@ -29,12 +31,20 @@ export function handleExtensionEvents() {
     extapi.app.onLog((name, text) => {
         console.log(`[LOG FROM "${name}"] ${text}`)
     })
+
     extapi.ui.theme.onRegister((name, data) => {
         themeRegisterCallback({ name: name, data: data })
     })
     extapi.ui.css.onLoad((id, content) => {
         onLoadCSSCallback({ id: id, content: content })
     })
+    extapi.ui.element.onCreate(data => {
+        onElementCreate(data)
+    })
+    extapi.ui.element.onMod(data => {
+        onElementMod(data)
+    })
+
     extapi.editor.docs.onRegister(data => {
         onNewDocumentationRegisterCallback({ data: data })
     })
@@ -53,12 +63,14 @@ export function handleExtensionEvents() {
     extapi.editor.fileExtensions.onRegister(data => {
         onNewFileExtensionsRegister(data)
     })
+
     extapi.app.onNotification((name, data) => {
         onNotificationCallback({ data: data, name: name })
     })
     extapi.app.onLocalizationRegister(data => {
         onLocalizationRegister(data)
     })
+
     extapi.app.onAudioPlay(data => {
         const path = data.path
         let volume = data.volume

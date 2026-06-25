@@ -131,6 +131,12 @@ contextBridge.exposeInMainWorld('electron', {
                 onLoad: (callback: any) => 
                     ipcRenderer.on("load-css", (event: any, name: any, content: any) => callback(name, content)),
             },
+            element: {
+                onCreate: (callback: any) => 
+                    ipcRenderer.on("extension-create-element", (event: any, data: object) => callback(data)),
+                onMod: (callback: any) => 
+                    ipcRenderer.on("extension-mod-element", (event: any, data: object) => callback(data)),
+            }
         },
         editor: {
             language: {
