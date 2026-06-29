@@ -1697,6 +1697,10 @@ body.explorer-resizing {
     color: var(--text-color);
     cursor: pointer;
 }
+.code-footer .code-footer__section-btn.disabled {
+    opacity: .5;
+    pointer-events: none;
+}
 .code-footer .code-footer__section-btn.row {
     display: flex;
     align-items: center;

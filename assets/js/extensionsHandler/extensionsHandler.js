@@ -189,6 +189,19 @@ export async function initExtensions() {
                 )
             }
         }
+        if("templates.register" in extensionPackage) {
+            const templatesConfig = extensionPackage["templates.register"]
+
+            if(templatesConfig.length > 0) {
+                window.electron.ext.editor.templates.register(
+                    {
+                        configPath: templatesConfig,
+                        extensionPath: normalizePath(extensionPath),
+                        extensionName: name
+                    }
+                )
+            }
+        }
         
         // 
         

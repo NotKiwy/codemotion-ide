@@ -17,6 +17,7 @@ import { onLocalizationRegister } from "./events/app/onLocalizationRegister.js"
 import { onFilenamesRegister } from "./events/editor/onFilenamesRegister.js"
 import { onElementCreate } from "./events/ui/onElementCreate.js"
 import { onElementMod } from "./events/ui/onElementMod.js"
+import { onTemplatesRegister } from "./events/editor/onTemplatesRegister.js"
 
 const preloadapi = window.electron
 const extapi = preloadapi.ext
@@ -62,6 +63,9 @@ export function handleExtensionEvents() {
     })
     extapi.editor.fileExtensions.onRegister(data => {
         onNewFileExtensionsRegister(data)
+    })
+    extapi.editor.templates.onRegister(data => {
+        onTemplatesRegister(data)
     })
 
     extapi.app.onNotification((name, data) => {

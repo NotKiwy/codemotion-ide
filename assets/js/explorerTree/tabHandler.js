@@ -16,7 +16,9 @@ import {
     loadAceModuleAsync,
     showCodeWindowVisuals,
     Filenames,
-    idify
+    idify,
+    CodeTemplates,
+    dedent
 } from "../lib.js"
 import { BottomWindow, closeAllWindows } from "../handlers/BottomWindowHandler.js"
 import { initJSSH } from "../../../ace/plugins/languageSyntaxEnhance.js"
@@ -56,6 +58,44 @@ export let currentPath = null;
 export const tabsBar = document.querySelector(".code-tabs");
 export const editorWrapper = document.querySelector(".code-inner__wrapper");
 export const startScreen = document.querySelector("#main-code");
+
+const codeToolsWrapper = document.querySelector("#code-tools")
+const templateChooseCodeTool = document.querySelector("#code-tools_template-choose")
+
+function bindCodeTools({ editor, extension }) {
+    const oldInstance = TopWindowList.get("chooseTemplate")
+
+    if (oldInstance != undefined) {
+        oldInstance.destroy()
+    }
+
+    const list = CodeTemplates.list()
+
+    console.log(list)
+
+    if (extension in list) {
+        templateChooseCodeTool.classList.remove("disabled")
+
+        const item = list[extension]
+        const currentTemplates = Object.keys(item).map(id => ({
+            name: item[id].name,
+            id: id
+        }))
+
+        const chooseTemplateList = new TopWindowList("chooseTemplate", currentTemplates)
+        chooseTemplateList.bind(templateChooseCodeTool)
+
+        chooseTemplateList.on("click", (data) => {
+            const id = parseInt(data.id)
+            const templateContent = dedent(item[id].content)
+
+            editor.setValue(templateContent)
+        })
+    }
+    else {
+        templateChooseCodeTool.classList.add("disabled")
+    }
+}
 
 const globalButtonsInitialized = new Map();
 let isLiveServerActive = false;
@@ -619,6 +659,8 @@ export async function openTab(path, content, extension, name, pathContext, isNew
 
     function updateEditorData() {
         let cursor = editor.getCursorPosition()
+        let editorValue = editor.getValue()
+        let editorSession = editor.getSession()
 
         let line = cursor.row
         let col = cursor.column
@@ -626,8 +668,15 @@ export async function openTab(path, content, extension, name, pathContext, isNew
         setColumn(col + 1)
         setLine(line + 1)
 
-        setSymbols(editor.getValue().length)
-        setErrors(editor.getSession().getAnnotations())
+        setSymbols(editorValue.length)
+        setErrors(editorSession.getAnnotations())
+
+        if(editorValue.trim().length > 0) {
+            codeToolsWrapper.classList.add("hidden")
+        }
+        else {
+            codeToolsWrapper.classList.remove("hidden")
+        }
     }
 
     ace.config.loadModule(`ace/mode/${language.mode}`, () => {
@@ -638,6 +687,10 @@ export async function openTab(path, content, extension, name, pathContext, isNew
             enableErrors(editor)
         }
     });
+
+    editor.renderer.on("afterRender", () => {
+        bindCodeTools({ editor: editor, extension: extension })
+    })
 
     editor.session.on('change', async () => {
         await setEditorContext({}, {
@@ -729,7 +782,8 @@ export async function openTab(path, content, extension, name, pathContext, isNew
         language: language,
         new: isNew,
         fileName: name,
-        color: language.color
+        color: language.color,
+        extension: extension
     });
 
     recentlyClosed.delete(path);
@@ -855,6 +909,7 @@ export function activateTab(tabEl) {
     if (!editor) return;
 
     bindEditorBtns(editor, { fileName: rec.fileName })
+    bindCodeTools({ editor: editor, extension: rec.extension })
 
     document.querySelectorAll(".explorer-elements .file").forEach(file => {
         file.classList.toggle("active", file.getAttribute("data-path") === realPath);

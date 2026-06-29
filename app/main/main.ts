@@ -38,6 +38,7 @@ require("../sandbox/regs/language")
 require("../sandbox/regs/docs")
 require("../sandbox/regs/filenames")
 require("../sandbox/regs/fileExtensions")
+require("../sandbox/regs/templates")
 
 console.log("APP PATH:", app.getAppPath());
 

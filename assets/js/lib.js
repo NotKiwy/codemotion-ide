@@ -14,6 +14,7 @@ import { valid } from "./modalsHandler/engine.js"
 import { createDIV, createIcon } from "./modalsHandler/handlers/helpers.js"
 import { _GLS } from "./libClasses/gls.js"
 import { _Filenames } from "./libClasses/fillenames.js"
+import { _CodeTemplates } from "./libClasses/codeTemplates.js"
 
 let runtimeErrors = []
 let runtimeErrorsCount = 0
@@ -31,6 +32,7 @@ export const Options = _Options
 export const ContextMenuLoader = _ContextMenuLoader
 export const Loader = _Loader
 export const GLS = _GLS
+export const CodeTemplates = _CodeTemplates
 
 // Language: adds a image icons
 const imageIcons = ["png", "jpg", "jpeg", "gif", "webp", "bmp", "svg", "ico", "avif", "tif", "tiff", "heic", "heif"]
@@ -919,6 +921,20 @@ export function transparentColor(color, alpha = 1) {
     }
 
     throw new Error('Unsupported color format');
+}
+export function dedent(str) {
+    const lines = str.replace(/^\n/, "").split("\n");
+
+    const indent = Math.min(
+        ...lines
+            .filter(line => line.trim())
+            .map(line => line.match(/^ */)[0].length)
+    );
+
+    return lines
+        .map(line => line.slice(indent))
+        .join("\n")
+        .trimEnd();
 }
 
 window.Notificator = Notificator
