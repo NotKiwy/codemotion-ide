@@ -71,8 +71,6 @@ function bindCodeTools({ editor, extension }) {
 
     const list = CodeTemplates.list()
 
-    console.log(list)
-
     if (extension in list) {
         templateChooseCodeTool.classList.remove("disabled")
 
@@ -131,7 +129,8 @@ export class themeEditors {
     static themes = {
         default: "github_dark",
         light: "clouds",
-        "contrast-dark": "tomorrow_night_bright"
+        "contrast-dark": "tomorrow_night_bright",
+        terminal: "tomorrow_night_bright"
     }
 
     constructor(editor) {

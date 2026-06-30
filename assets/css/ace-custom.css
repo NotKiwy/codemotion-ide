@@ -282,4 +282,5 @@
 .ace-flash.hidden {
     display: flex!important;
     opacity: 0;
+    pointer-events: none;
 }

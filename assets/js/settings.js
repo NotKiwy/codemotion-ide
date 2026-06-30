@@ -14,6 +14,7 @@ const themeSelect = new Options("themeSelect")
 themeSelect.add("default", "Default").default()
 themeSelect.add("light", "Light")
 themeSelect.add("contrast-dark", "Contrast dark")
+themeSelect.add("terminal", "Terminal")
 
 const pythonRunnerMethodSelect = new Options("pythonRunnerMethod")
 const languageSelect = new Options("languageSelect")
