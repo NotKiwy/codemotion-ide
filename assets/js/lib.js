@@ -936,6 +936,18 @@ export function dedent(str) {
         .join("\n")
         .trimEnd();
 }
+export function fitAceHeight(editor, minHeight = 50, maxHeight = 800) {
+    const lines = editor.session.getLength();
+    const lineHeight = editor.renderer.lineHeight;
+
+    const height = Math.min(
+        maxHeight,
+        Math.max(minHeight, lines * lineHeight)
+    );
+
+    editor.container.style.height = height + "px";
+    editor.resize();
+}
 
 window.Notificator = Notificator
 window.addToBug = addToBug

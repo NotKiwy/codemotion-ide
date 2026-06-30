@@ -18,7 +18,9 @@ import {
     Filenames,
     idify,
     CodeTemplates,
-    dedent
+    dedent,
+    GLS,
+    fitAceHeight
 } from "../lib.js"
 import { BottomWindow, closeAllWindows } from "../handlers/BottomWindowHandler.js"
 import { initJSSH } from "../../../ace/plugins/languageSyntaxEnhance.js"
@@ -48,6 +50,7 @@ import { renderPyMsgSuccess, renderPyMsgErr } from "../terminalRenderer/PyRuntim
 import { triggerAceChanged, triggerAceClicked } from "./triggers.js"
 import { TopWindowList, destroyAllTopWindowLists } from "../topWindowHandler/topWindowList.js"
 import { setEditorContext } from "./helpers/setEditorContext.js"
+import { Modal } from "../modalsHandler/engine.js"
 
 export const recentlyClosed = new Map();
 export const tabsByPath = new Map();
@@ -62,12 +65,26 @@ export const startScreen = document.querySelector("#main-code");
 const codeToolsWrapper = document.querySelector("#code-tools")
 const templateChooseCodeTool = document.querySelector("#code-tools_template-choose")
 
-function bindCodeTools({ editor, extension }) {
+async function bindCodeTools({ editor, extension }) {
+    const gls = await GLS.init()
+    const placeholderRegex = /%\{\{\s*([a-zA-Z0-9_-]+)\s*\}\}/gm;
     const oldInstance = TopWindowList.get("chooseTemplate")
+
+    function extractPlaceholders(str) {
+        return [...str.matchAll(placeholderRegex)].map(match => match[1].trim());
+    }
+    function clearPlaceholders(str) {
+        return str.replaceAll(placeholderRegex, "")
+    }
+    function lgls(key, props = {}) {
+        return gls.get(`modals.templates.${key}`, props)
+    }
 
     if (oldInstance != undefined) {
         oldInstance.destroy()
     }
+
+    Modal.destroy("templatePlaceholders")
 
     const list = CodeTemplates.list()
 
@@ -85,9 +102,92 @@ function bindCodeTools({ editor, extension }) {
 
         chooseTemplateList.on("click", (data) => {
             const id = parseInt(data.id)
-            const templateContent = dedent(item[id].content)
+            let templateContent = dedent(item[id].content)
+            const placeholders = extractPlaceholders(templateContent)
 
-            editor.setValue(templateContent)
+            if(placeholders.length > 0) {
+                const modalInputs = []
+
+                placeholders.forEach(p => {
+                    modalInputs.push(
+                        {
+                            type: "input",
+                            placeholder: capitilize(p).replaceAll(/[-_]/g, " "),
+                            id: p
+                        }
+                    )
+                })
+
+                const modal = Modal.create(
+                    {
+                        id: "templatePlaceholders",
+                        name: "templatePlaceholders",
+                        modalClassList: ["window"],
+                        size: "mini",
+                        title: lgls("placeholders.title"),
+
+                        content: [
+                            {
+                                type: "row",
+                                gap: 15,
+                                classList: ['background'],
+                                items: [
+                                    {
+                                        type: "placeholder",
+                                        title: lgls("placeholders.inner.title"),
+                                        description: lgls("placeholders.inner.description")
+                                    },
+                                    ...modalInputs,
+                                    {
+                                        type: "container",
+                                        id: "buttonsContainer"
+                                    },
+                                    {
+                                        type: "button",
+                                        id: "templateOk",
+                                        title: lgls("placeholders.inner.confirmBtn"),
+                                        container: "#buttonsContainer"
+                                    },
+                                    {
+                                        type: "button",
+                                        id: "templateSkip",
+                                        title: lgls("placeholders.inner.skipBtn"),
+                                        container: "#buttonsContainer",
+                                        class: "secondary"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                )
+
+                modal.open()
+
+                const modalEl = modal.el
+                const skipBtn = modalEl.querySelector("#templateSkip")
+                const okBtn = modalEl.querySelector("#templateOk")
+
+                skipBtn.onclick = () => {
+                    editor.setValue(clearPlaceholders(templateContent))
+                    modal.close()
+                }
+
+                okBtn.onclick = () => {
+                    templateContent = templateContent.replace(
+                        placeholderRegex,
+                        (_, key) => {
+                            const input = modalEl.querySelector(`#${key.trim()}`);
+                            return input ? input.value : "";
+                        }
+                    );
+
+                    editor.setValue(templateContent)
+                    modal.close()
+                }
+            }
+            else {
+                editor.setValue(clearPlaceholders(templateContent))
+            }
         })
     }
     else {

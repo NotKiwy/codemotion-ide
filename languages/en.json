@@ -346,6 +346,20 @@
                 "description": "This action cannot be undone. If you do this now, you will have to log in again"
             },
             "buttonConfirm": "Logout"
+        },
+
+        "templates": {
+            "placeholders": {
+                "title": "Fill out the template",
+
+                "inner": {
+                    "title": "The template contains placeholders",
+                    "description": "Fill them out below or skip this step",
+
+                    "confirmBtn": "Confirm",
+                    "skipBtn": "Skip"
+                }
+            }
         }
     },
 
