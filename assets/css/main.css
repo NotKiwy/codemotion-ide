@@ -871,6 +871,7 @@ body.explorer-resizing {
 .explorer-elements .folder-icon {
     width: 15px;
     flex: 0 0 auto;
+    z-index: 1;
 }
 .explorer-elements .dir {
     display: flex;

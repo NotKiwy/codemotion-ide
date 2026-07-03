@@ -836,11 +836,13 @@ export async function openTab(path, content, extension, name, pathContext, isNew
 
     if (cached) {
         editor.setValue(cached.content ?? "", -1);
+        editor.session.getUndoManager().reset();
         setErrors(editor.getSession().getAnnotations())
         if (cached.cursor) editor.selection.moveTo(cached.cursor.row, cached.cursor.column);
         if (typeof cached.scrollTop === "number") editor.session.setScrollTop(cached.scrollTop);
     } else {
         editor.setValue(content ?? "", -1);
+        editor.session.getUndoManager().reset();
         setErrors(editor.getSession().getAnnotations())
     }
 
