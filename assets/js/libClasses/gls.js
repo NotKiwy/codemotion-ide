@@ -36,7 +36,7 @@ export class _GLS {
         const langPack = this.registry[this.currentLang]
         if (!langPack) return key
 
-        const parts = key.split('.')
+        const parts = key.split(".")
         let current = langPack
 
         for (let i = 0; i < parts.length; i++) {
@@ -45,11 +45,17 @@ export class _GLS {
             if (current === undefined) return key
         }
 
-        if (typeof current !== "string") current = String(current)
+        if (typeof current !== "string") {
+            current = String(current)
+        }
+
+        current = current.replace(/\{\{\s*([^{}]+?)\s*\}\}/g, (_, path) => {
+            return this.get(path.trim(), replacements, depth + 1)
+        })
 
         if (typeof replacements === "object" && !Array.isArray(replacements)) {
             for (const r in replacements) {
-                current = current.replaceAll(`%{${r}}`, replacements[r])
+                current = current.replaceAll(`%{${r}}`, String(replacements[r]))
             }
         }
 
