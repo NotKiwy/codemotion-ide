@@ -5,6 +5,8 @@ export function onElementCreate(data) {
         const type = data.type
         const id = data.id
 
+        const elements = {}
+
         if(type == "image") {
             const img = document.createElement("img")
             img.id = id

@@ -188,6 +188,17 @@ async function createWindow() {
         }
     });
 
+    ipcMain.on("set-app-title", (_, title) => {
+        if (mainWindow) {
+            if(title != undefined) {
+                mainWindow.setTitle(`${title} - CodeMotion IDE`)
+            }
+            else {
+                mainWindow.setTitle(`CodeMotion IDE`)
+            }
+        }
+    });
+
     ipcMain.on("reload", () => {
         terminalManager.killProcessTree(true);
         terminalManager.cleanupInputHandler();

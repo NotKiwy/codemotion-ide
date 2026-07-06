@@ -20,7 +20,8 @@ import {
     CodeTemplates,
     dedent,
     GLS,
-    fitAceHeight
+    fitAceHeight,
+    setAppTitle
 } from "../lib.js"
 import { BottomWindow, closeAllWindows } from "../handlers/BottomWindowHandler.js"
 import { initJSSH } from "../../../ace/plugins/languageSyntaxEnhance.js"
@@ -643,6 +644,7 @@ function initExtensionEditorAPIEvents({ editor }) {
 
 export async function openTab(path, content, extension, name, pathContext, isNew = false, settings = {}) {
     closeAllWindows()
+    setAppTitle(name)
 
     currentContent = content
     settingsObject = settings
@@ -1017,6 +1019,7 @@ export function closeTab(path) {
     destroyCodeContextMenu();
 
     try { editor.destroy(); } catch (_) { }
+    
     if (paneEl && paneEl.parentNode) paneEl.parentNode.removeChild(paneEl);
 
     const next = tabEl.nextElementSibling?.classList.contains("code-tab") ? tabEl.nextElementSibling : null;
@@ -1033,6 +1036,8 @@ export function closeTab(path) {
         toggleCodeFooter(false)
         tabsBar.classList.add("hidden");
         currentPath = null;
+
+        setAppTitle()
     } else if (toActivate) {
         activateTab(toActivate);
     }

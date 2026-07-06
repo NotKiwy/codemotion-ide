@@ -32,6 +32,7 @@ contextBridge.exposeInMainWorld('electron', {
     saveFile: (path: string, content: string) => ipcRenderer.invoke("save-file", path, content),
 
     setNonAccountMode: (value: boolean) => ipcRenderer.invoke("set-non-account-mode", value),
+    setAppTitle: (title: string) => ipcRenderer.send("set-app-title", title),
 
     askToSaveNewFile: (properties: SaveContentPayload) => ipcRenderer.invoke("ask-to-save-content", properties),
 

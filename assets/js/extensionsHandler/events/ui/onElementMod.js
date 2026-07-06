@@ -13,11 +13,14 @@ function sendToElement(id, type, data) {
     )
 }
 
-export function onElementMod(data) {
+export function onElementMod(data, modules = {}) {
     const id = data.id
     const type = data.type
     const context = data.extName
     const value = data.value
+
+    const topbarElementInstance = modules.TopBarElement
+    const idify = modules.idify
 
     const el = getEl(id)
 
@@ -66,5 +69,63 @@ export function onElementMod(data) {
         })
 
         el.style.cssText += styles.join(";")
+    }
+    if(type == "setTopbarItemSetup") {
+        const topbarItem = new topbarElementInstance(id)
+        const item = topbarItem.item
+
+        if("colors" in value) {
+            if("background" in value.colors) item.style.background = value.colors.background
+            if("text" in value.colors) item.style.color = value.colors.text
+        }
+
+        topbarItem.content(value)
+        topbarItem.show()
+    }
+    if(type == "setTopbarItemHide") {
+        const idifiedID = idify(id)
+
+        if (topbarElementInstance.instances.has(idifiedID)) {
+            const topbarItem = topbarElementInstance.instances.get(idifiedID)
+
+            requestAnimationFrame(() => {
+                topbarItem.hide()
+            })
+        }
+    }
+    if(type == "setTopbarItemHideWithIcon") {
+        const idifiedID = idify(id)
+
+        if (topbarElementInstance.instances.has(idifiedID)) {
+            const topbarItem = topbarElementInstance.instances.get(idifiedID)
+
+            requestAnimationFrame(() => {
+                topbarItem.hide({ iconVisible: true })
+            })
+        }
+    }
+    if(type == "setTopbarItemShow") {
+        const idifiedID = idify(id)
+
+        if (topbarElementInstance.instances.has(idifiedID)) {
+            const topbarItem = topbarElementInstance.instances.get(idifiedID)
+
+            requestAnimationFrame(() => {
+                topbarItem.show()
+            })
+        }
+    }
+    if(type == "setTopbarItemEvent") {
+        const idifiedID = idify(id)
+
+        if (topbarElementInstance.instances.has(idifiedID)) {
+            const topbarItem = topbarElementInstance.instances.get(idifiedID)
+
+            requestAnimationFrame(() => {
+                topbarItem.on(value, () => {
+                    sendToElement(id, "onEventTriggered", { eventName: value })
+                })
+            })
+        }
     }
 }

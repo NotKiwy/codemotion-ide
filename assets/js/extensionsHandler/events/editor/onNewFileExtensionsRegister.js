@@ -5,9 +5,6 @@ export function onNewFileExtensionsRegister(data) {
     const config = data.config
     const extPath = data.extPath
 
-    console.log(list)
-    console.log(config)
-
     Object.keys(config).forEach(item => {
         const itemConfig = config[item]
 

@@ -23,15 +23,27 @@ export class _TopBarElement {
         }
 
         this.item = item
+        this._animationToken = 0
 
         _TopBarElement.instances.set(normalizedId, this)
     }
 
-    content({ text, icon, type }) {
+    content({ text, icon, type, image }) {
         this.item.innerHTML = ""
 
         const container = document.createElement("div")
         container.className = "topbar-center__row"
+
+        if(image) {
+            icon = false
+
+            const imageEl = document.createElement("img")
+            imageEl.className = "topbar-center__image-icon"
+            imageEl.src = image
+            imageEl.id = "icon"
+
+            container.appendChild(imageEl)
+        }
 
         if (icon) {
             const iconEl = document.createElement("span")
@@ -65,8 +77,15 @@ export class _TopBarElement {
 
     show() {
         const el = this.item
+        const icon = el.querySelector("#icon")
+        const text = el.querySelector(".topbar-center__text")
+
+        const token = ++this._animationToken
 
         el.classList.remove("hidden")
+
+        if (icon) icon.style.marginLeft = "0px"
+        if (text) text.classList.remove("hidden")
 
         el.style.maxWidth = "0px"
         el.style.minWidth = "0px"
@@ -75,26 +94,25 @@ export class _TopBarElement {
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
+                if (token !== this._animationToken) return
+
                 el.style.maxWidth = width + "px"
                 el.style.minWidth = width + "px"
-
-                const icon = el.querySelector("#icon")
-                const text = el.querySelector(".topbar-center__text")
-
-                if (icon) icon.style.marginLeft = "0px"
-                if (text) text.classList.remove("hidden")
             })
         })
     }
 
     hide({ iconVisible = false } = {}) {
         const el = this.item
+        const icon = el.querySelector("#icon")
+        const text = el.querySelector(".topbar-center__text")
+
+        const token = ++this._animationToken
 
         el.style.maxWidth = el.scrollWidth + "px"
 
         requestAnimationFrame(() => {
-            const icon = el.querySelector("#icon")
-            const text = el.querySelector(".topbar-center__text")
+            if (token !== this._animationToken) return
 
             if (!iconVisible) {
                 el.style.maxWidth = "0px"

@@ -15,6 +15,8 @@ function callback(data) {
     const extName = data.extensionName
     const extPath = data.extensionPath
 
+    const allowedImageFormats = ["gif", "png", "jpg", "jpeg"]
+
     const c = createSandboxConsole(extName, debuggerSender)
 
     const list = {}
@@ -23,13 +25,19 @@ function callback(data) {
         const id = crypto.randomUUID()
         const events = {}
 
+        function genObj(object) {
+            return {
+                id: id,
+                extName: extName,
+                ...object
+            }
+        }
+
         list[id] = {}
 
-        mainSender.send("extension-create-element", {
-            type: type,
-            id: id,
-            extName: extName
-        })
+        mainSender.send("extension-create-element", genObj({
+            type: type
+        }))
 
         const properties = {
             on: (eventName, callback) => {
@@ -40,12 +48,10 @@ function callback(data) {
                     c.error(`[${type}:on] Callback must be a function`)
                 }
 
-                mainSender.send("extension-mod-element", {
-                    id: id,
+                mainSender.send("extension-mod-element", genObj({
                     type: "onEvent",
                     value: eventName,
-                    extName: extName
-                })
+                }))
 
                 events[eventName] = callback
 
@@ -67,15 +73,13 @@ function callback(data) {
                     c.error(`[${type}:setSize] Undefined size name(-s): ${sizesMatch.join(", ")}`)
                 }
 
-                mainSender.send("extension-mod-element", {
-                    id: id,
+                mainSender.send("extension-mod-element", genObj({
                     type: "setSize",
                     value: {
                         availableSizes: sizes,
                         sizes: object
                     },
-                    extName: extName
-                })
+                }))
 
                 list[id]["size"] = object
             },
@@ -97,15 +101,13 @@ function callback(data) {
                     c.error(`[${type}:setPosition] Undefined position name(-s): ${positionsMatch.join(", ")}`)
                 }
 
-                mainSender.send("extension-mod-element", {
-                    id: id,
+                mainSender.send("extension-mod-element", genObj({
                     type: "setPosition",
                     value: {
                         availablePositions: positions,
                         positions: object
-                    },
-                    extName: extName
-                })
+                    }
+                }))
 
                 list[id]["position"] = object
             }
@@ -113,22 +115,61 @@ function callback(data) {
 
         if(type == "image") {
             properties["src"] = (srcPath) => {
-                const allowedFormats = ["gif", "png", "jpg", "jpeg"]
-
-                if(!allowedFormats.includes(srcPath.split(".").pop())) {
-                    c.error(`[${type}:src] This image format is not supported. Supported formats: ${allowedFormats.join(", ")}`)
+                if(!allowedImageFormats.includes(srcPath.split(".").pop())) {
+                    c.error(`[${type}:src] This image format is not supported. Supported formats: ${allowedImageFormats.join(", ")}`)
                 }
 
                 const p = path.join(extPath, srcPath)
 
-                mainSender.send("extension-mod-element", {
-                    id: id,
+                mainSender.send("extension-mod-element", genObj({
                     type: "setSrc",
                     value: p,
-                    extName: extName
-                })
+                }))
 
                 list[id]["src"] = p
+            }
+        }
+
+        if(type == "topbarItem") {
+            properties["setup"] = (properties = {}) => {
+                if("image" in properties) {
+                    if(!allowedImageFormats.includes(properties.image.split(".").pop())) {
+                        c.error(`[${type}:setup:image] This image format is not supported. Supported formats: ${allowedImageFormats.join(", ")}`)
+                    }
+                    properties.image = path.join(extPath, properties.image)
+                }
+
+                mainSender.send("extension-mod-element", genObj({
+                    type: "setTopbarItemSetup",
+                    value: properties,
+                }))
+
+                list[id]["properties"] = properties
+            }
+            properties["hide"] = () => {
+                mainSender.send("extension-mod-element", genObj({
+                    type: "setTopbarItemHide"
+                }))
+            }
+            properties["hideText"] = () => {
+                mainSender.send("extension-mod-element", genObj({
+                    type: "setTopbarItemHideWithIcon"
+                }))
+            }
+            properties["show"] = () => {
+                mainSender.send("extension-mod-element", genObj({
+                    type: "setTopbarItemShow"
+                }))
+            }
+            properties["on"] = (eventName, callback = () => {}) => {
+                mainSender.send("extension-mod-element", genObj({
+                    type: "setTopbarItemEvent",
+                    value: eventName
+                }))
+
+                events[eventName] = callback
+
+                list[id]["events"] = events
             }
         }
 
@@ -153,7 +194,8 @@ function callback(data) {
     })
 
     const elements = {
-        image: createElement("image")
+        image: createElement("image"),
+        topbarItem: createElement("topbarItem")
     }
 
     if(elType in elements) {

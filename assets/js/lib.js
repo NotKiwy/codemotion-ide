@@ -948,6 +948,9 @@ export function fitAceHeight(editor, minHeight = 50, maxHeight = 800) {
     editor.container.style.height = height + "px";
     editor.resize();
 }
+export function setAppTitle(title) {
+    window.electron.setAppTitle(title)
+}
 
 window.Notificator = Notificator
 window.addToBug = addToBug

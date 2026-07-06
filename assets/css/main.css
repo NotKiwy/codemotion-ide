@@ -441,6 +441,9 @@ input~span {
 .topbar-center .topbar-center__text {
     transition: .2s;
 }
+.topbar-center .topbar-center__image-icon {
+    width: 14px;
+}
 .topbar-center .topbar-center__text.hidden {
     display: block!important;
     opacity: 0;
