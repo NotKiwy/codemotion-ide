@@ -869,6 +869,37 @@ export async function openTab(path, content, extension, name, pathContext, isNew
         `;
     tabsBar.appendChild(tab);
 
+    tab.draggable = true
+
+    tab.addEventListener('dragstart', () => tab.classList.add('dragging'))
+
+    tab.addEventListener('dragend', () => {
+        tab.classList.remove('dragging')
+        tabsBar.querySelectorAll('.drag-over-left, .drag-over-right')
+            .forEach(t => t.classList.remove('drag-over-left', 'drag-over-right'))
+    })
+
+    tab.addEventListener('dragover', (e) => {
+        e.preventDefault()
+        const dragging = tabsBar.querySelector('.dragging')
+        if (!dragging || dragging === tab) return
+        tabsBar.querySelectorAll('.drag-over-left, .drag-over-right')
+            .forEach(t => t.classList.remove('drag-over-left', 'drag-over-right'))
+        const { left, width } = tab.getBoundingClientRect()
+        tab.classList.add(e.clientX < left + width / 2 ? 'drag-over-left' : 'drag-over-right')
+    })
+
+    tab.addEventListener('dragleave', () => tab.classList.remove('drag-over-left', 'drag-over-right'))
+
+    tab.addEventListener('drop', (e) => {
+        e.preventDefault()
+        const dragging = tabsBar.querySelector('.dragging')
+        if (!dragging || dragging === tab) return
+        const { left, width } = tab.getBoundingClientRect()
+        tabsBar.insertBefore(dragging, e.clientX < left + width / 2 ? tab : tab.nextSibling)
+        tab.classList.remove('drag-over-left', 'drag-over-right')
+    })
+
     // if tab is a new file (from dragNdrop or smth)
 
     if (isNew) {
