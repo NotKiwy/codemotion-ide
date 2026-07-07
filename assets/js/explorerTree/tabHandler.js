@@ -557,8 +557,10 @@ function initializeGlobalButtons(settings = {}) {
 function initializeChangeTabSizeButton(settings) {
     let currentTabSize = 2;
 
-    if(settings.editor.tabSize != undefined && settings.editor.tabSize.length != 0) {
-        currentTabSize = settings.editor.tabSize
+    if("editor" in settings && "tabSize" in settings.editor) {
+        if(settings.editor.tabSize != undefined && settings.editor.tabSize.length != 0) {
+            currentTabSize = settings.editor.tabSize
+        }
     }
 
     const el = document.querySelector("#changeTabSize")
@@ -871,12 +873,17 @@ export async function openTab(path, content, extension, name, pathContext, isNew
 
     tab.draggable = true
 
-    tab.addEventListener('dragstart', () => tab.classList.add('dragging'))
+    tab.addEventListener('dragstart', () => {
+        tab.classList.add('dragging')
+        console.log('dragstart')
+    })
 
     tab.addEventListener('dragend', () => {
         tab.classList.remove('dragging')
         tabsBar.querySelectorAll('.drag-over-left, .drag-over-right')
             .forEach(t => t.classList.remove('drag-over-left', 'drag-over-right'))
+
+        console.log('dragend')
     })
 
     tab.addEventListener('dragover', (e) => {
@@ -887,9 +894,15 @@ export async function openTab(path, content, extension, name, pathContext, isNew
             .forEach(t => t.classList.remove('drag-over-left', 'drag-over-right'))
         const { left, width } = tab.getBoundingClientRect()
         tab.classList.add(e.clientX < left + width / 2 ? 'drag-over-left' : 'drag-over-right')
+
+        console.log('dragover')
     })
 
-    tab.addEventListener('dragleave', () => tab.classList.remove('drag-over-left', 'drag-over-right'))
+    tab.addEventListener('dragleave', () => {
+        tab.classList.remove('drag-over-left', 'drag-over-right')
+
+        console.log('dragleave')
+    })
 
     tab.addEventListener('drop', (e) => {
         e.preventDefault()
@@ -898,6 +911,8 @@ export async function openTab(path, content, extension, name, pathContext, isNew
         const { left, width } = tab.getBoundingClientRect()
         tabsBar.insertBefore(dragging, e.clientX < left + width / 2 ? tab : tab.nextSibling)
         tab.classList.remove('drag-over-left', 'drag-over-right')
+
+        console.log('drop')
     })
 
     // if tab is a new file (from dragNdrop or smth)
