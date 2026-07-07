@@ -15,7 +15,7 @@ function callback(data) {
     const extName = data.extensionName
     const extPath = data.extensionPath
 
-    const allowedImageFormats = ["gif", "png", "jpg", "jpeg"]
+    const allowedImageFormats = ["gif", "png", "jpg", "jpeg", "svg"]
 
     const c = createSandboxConsole(extName, debuggerSender)
 
