@@ -137,6 +137,6 @@ l-line-spinner.animate-appearance {
     color: #f33b3b;
     font-weight: 500;
     position: absolute;
-    bottom: 280px;
+    bottom: 15%;
     transition: .4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
