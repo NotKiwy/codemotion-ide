@@ -351,6 +351,13 @@ export class _Languages {
             iconExt: "svg",
             mode: "vue",
             color: "#46cc82"  
+        },
+        exe: {
+            name: "Executable file",
+            icon: "exe",
+            iconExt: "svg",
+            mode: "text",
+            color: "#a51212" 
         }
     }
     
