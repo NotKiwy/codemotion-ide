@@ -120,6 +120,7 @@ contextBridge.exposeInMainWorld('electron', {
     javascriptDiagnostic: (code: string) => ipcRenderer.invoke("javascript-diagnostic", code),
     javascriptAST: (code: string) => ipcRenderer.invoke("javascript-ast", code),
     typescriptAST: (code: string) => ipcRenderer.invoke("typescript-ast", code),
+    golangAST: (code: string) => ipcRenderer.invoke("golang-ast", code),
 
     // for extensions
 

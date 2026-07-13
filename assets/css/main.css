@@ -909,7 +909,7 @@ body.explorer-resizing {
     bottom: 5px;
     width: 1px;
     height: calc(100% - 28px);
-    background: var(--expanded-line);
+    background: linear-gradient(45deg, transparent 5%, var(--expanded-line) 80%);
 }
 .explorer-elements .dir.expanded.ignored::before {
     opacity: .45;

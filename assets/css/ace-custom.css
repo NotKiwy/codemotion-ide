@@ -293,10 +293,6 @@
     color: var(--color-template-literal-wrapper)
 }
 
-.ace_function_argument {
-    color: var(--function-argument)
-}
-
 .ace_character {
     color: var(--color-character)
 }

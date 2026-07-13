@@ -5,6 +5,7 @@ import { HTMLParser } from "../../contextParsers/htmlParser.js"
 import { CSSParser } from "../../contextParsers/cssParser.js"
 
 import { addRuntimeError } from "../../lib.js"
+import { GoParser } from "../../contextParsers/goParser.js"
 
 const errors = new Map()
 const markerIds = new Set()
@@ -204,6 +205,15 @@ export async function setEditorContext(properties = {}, { editor, language, upda
         cssParser.renderContext(chain)
     }
 
+    else if (language.mode === "golang") {
+        const goParser = new GoParser()
+        const ast = await window.electron.golangAST(editor.getValue())
+        const row = editor.getCursorPosition().row + 1
+        
+        const chain = goParser.getContextChain(ast, row)
+        goParser.renderContext(chain)
+    }
+
     else {
         editor.getSession().setUseWorker(true)
 
@@ -212,4 +222,6 @@ export async function setEditorContext(properties = {}, { editor, language, upda
             codeStructure.textContent = `Context unavailable for ${language.name}`
         }
     }
+
+    console.log(language.mode)
 }
