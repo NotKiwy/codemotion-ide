@@ -101,7 +101,6 @@ export class GoParser {
             }
         }
 
-        // рекурсия в дочерние узлы
         for (const key of ["body", "declarations", "methods", "fields"]) {
             const val = node[key];
             if (Array.isArray(val)) {
