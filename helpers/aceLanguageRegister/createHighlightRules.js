@@ -84,7 +84,10 @@ export function createHighlightRules(config = {}) {
     if (config.custom) {
         config.custom.forEach(e => {
             if (e.regex && e.type) {
-                const rule = { token: e.type, regex: e.regex }
+                const token = Array.isArray(e.type) && e.type.length === 1
+                    ? e.type[0]
+                    : e.type
+                const rule = { token, regex: e.regex }
                 if (e.push) rule.push = e.push
                 if (e.next) rule.next = e.next
                 rules.push(rule)

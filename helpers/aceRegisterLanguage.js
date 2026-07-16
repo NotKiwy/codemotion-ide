@@ -6,6 +6,29 @@ import { enableAutoBrackets } from "./aceLanguageRegister/enableAutoBrackets.js"
 const registeredCompleters = new Set()
 const registeredModes = new Set()
 
+function resolveBaseHighlightRulesClass(useMode) {
+    const TextHighlightRules = ace.require("ace/mode/text_highlight_rules").TextHighlightRules
+
+    if (!useMode) return TextHighlightRules
+
+    const baseModuleId = `ace/mode/${useMode}_highlight_rules`
+    const baseExports = ace.require(baseModuleId)
+
+    if (!baseExports) {
+        console.warn(`[registerAceLanguage] useMode: "${useMode}" — модуль ${baseModuleId} не найден. Fallback на TextHighlightRules.`)
+        return TextHighlightRules
+    }
+
+    const exportKey = Object.keys(baseExports).find(k => k.endsWith("HighlightRules"))
+
+    if (!exportKey) {
+        console.warn(`[registerAceLanguage] useMode: "${useMode}" — в ${baseModuleId} нет экспорта *HighlightRules.`)
+        return TextHighlightRules
+    }
+
+    return baseExports[exportKey]
+}
+
 export function registerAceLanguage(id, config = {}) {
     if (registeredModes.has(id)) return
     registeredModes.add(id)
@@ -39,21 +62,55 @@ export function registerAceLanguage(id, config = {}) {
 
             const oop = require("ace/lib/oop")
 
-            const BaseHighlightRules = require("ace/mode/text_highlight_rules").TextHighlightRules
+            const BaseHighlightRules = resolveBaseHighlightRulesClass(config.useMode)
 
             const CustomHighlightRules = function() {
+                const originalNormalizeRules = BaseHighlightRules.prototype.normalizeRules
+                BaseHighlightRules.prototype.normalizeRules = function() {}
+
                 BaseHighlightRules.call(this)
 
-                const customRules = rules
+                BaseHighlightRules.prototype.normalizeRules = originalNormalizeRules
 
                 if (!this.$rules) this.$rules = {}
 
-                Object.keys(customRules || {}).forEach((stateName) => {
-                    const stateRules = customRules[stateName]
+                Object.keys(rules || {}).forEach((stateName) => {
+                    const stateRules = rules[stateName]
                     if (!stateRules || !stateRules.length) return
 
-                    if (stateName === "start" && this.$rules.start && this.$rules.start.length) {
-                        this.$rules.start.unshift(...stateRules)
+                    const isStartState = stateName === "start"
+                    const hasBaseRules = this.$rules[stateName] && this.$rules[stateName].length
+
+                    if (isStartState && hasBaseRules) {
+                        const lastRule = stateRules[stateRules.length - 1]
+                        const isGenericClassifier = typeof lastRule?.token === "function"
+                            && lastRule.regex === "\\b[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+
+                        const specificRules = isGenericClassifier
+                            ? stateRules.slice(0, -1)
+                            : stateRules
+
+                        this.$rules[stateName].unshift(...specificRules)
+
+                        if (isGenericClassifier) {
+                            const baseGenericRule = this.$rules[stateName].find(
+                                r => typeof r.token === "function" && r !== lastRule
+                            )
+
+                            if (baseGenericRule) {
+                                const originalToken = baseGenericRule.token
+                                const slimToken = lastRule.token
+
+                                baseGenericRule.token = function(value) {
+                                    const slimResult = slimToken(value)
+                                    return slimResult !== "text"
+                                        ? slimResult
+                                        : originalToken.call(this, value)
+                                }
+                            } else {
+                                this.$rules[stateName].push(lastRule)
+                            }
+                        }
                     } else {
                         this.$rules[stateName] = stateRules
                     }
@@ -95,5 +152,11 @@ export function registerAceLanguage(id, config = {}) {
         })
     }
 
-    registerMode()
+    if (config.useMode) {
+        ace.config.loadModule(["mode", config.useMode], () => {
+            registerMode()
+        })
+    } else {
+        registerMode()
+    }
 }
