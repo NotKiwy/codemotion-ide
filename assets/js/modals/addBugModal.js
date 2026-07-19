@@ -5,7 +5,7 @@ import { GLS } from "../lib.js"
 import { addBug } from "../coopHandlers/addBug.js"
 
 export async function getAddBugModal() {
-    const gls = await GLS.init()
+    const gls = await GLS.initLocal()
 
     let priority = 0
     let assignID = 0

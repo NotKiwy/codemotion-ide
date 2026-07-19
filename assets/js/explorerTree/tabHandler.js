@@ -1004,13 +1004,11 @@ bus.addEventListener("on-setting-colored-tabs", (data) => {
 })
 
 async function showCloseConfirmModal(path, editor) {
-    const gls = GLS.initLocal();
     const fileName = path.split(/[\\/]/).pop();
 
-    const modal = closeConfirmModal(
+    const modal = await closeConfirmModal(
         {
-            fileName: fileName,
-            gls: gls
+            fileName: fileName
         }
     )
 

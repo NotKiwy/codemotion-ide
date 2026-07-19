@@ -1701,6 +1701,9 @@ body.explorer-resizing {
 .code-structure .context-item span[class^="material-symbols"].block-class {
     color: var(--color-class);
 }
+.code-structure .context-item span[class^="material-symbols"].await {
+    color: var(--color-other);
+}
 .code-footer.hidden .code-footer__section .visible-after-opened-folder {
     display: none;
 }

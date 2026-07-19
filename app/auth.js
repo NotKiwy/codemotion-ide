@@ -8,7 +8,7 @@ const { API } = require("./main/helpers/paths.js");
 
 async function register(username, email, password, passwordConfirm) {
     try {
-        const response = await fetch(`${API}/auth/register.php`, {
+        const response = await fetch(`${API}/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -47,7 +47,7 @@ async function register(username, email, password, passwordConfirm) {
 
 async function login(email, password) {
     try {
-        const response = await fetch(`${API}/auth/checkLogin.php`, {
+        const response = await fetch(`${API}/auth/checkLogin`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -81,7 +81,7 @@ async function login(email, password) {
 
 async function loginById(id, password) {
     try {
-        const response = await fetch(`${API}/auth/checkLogin.php`, {
+        const response = await fetch(`${API}/auth/checkLogin`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -115,7 +115,7 @@ async function loginById(id, password) {
 
 async function verifyToken(token) {
     try {
-        const response = await fetch(`${API}/verifyToken.php`, {
+        const response = await fetch(`${API}/verifyToken`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -194,7 +194,7 @@ function decodeJWT(token) {
 
 async function recoveryCode(email) {
     try {
-        const response = await fetch(`${API}/auth/requestRecovery.php`, {
+        const response = await fetch(`${API}/auth/requestRecovery`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -216,7 +216,7 @@ async function recoveryCode(email) {
 
 async function verifyRecoveryCode(email, code) {
     try {
-        const response = await fetch(`${API}/auth/verifyRecoveryCode.php`, {
+        const response = await fetch(`${API}/auth/verifyRecoveryCode`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -240,7 +240,7 @@ async function verifyRecoveryCode(email, code) {
 
 async function resetPassword(recoveryToken, newPassword) {
     try {
-        const response = await fetch(`${API}/auth/resetPassword.php`, {
+        const response = await fetch(`${API}/auth/resetPassword`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

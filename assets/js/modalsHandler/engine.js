@@ -97,14 +97,14 @@ export class Modal {
             return modalBase.body.classList.contains("modal-body-sidebar")
         }
 
-        document.body.prepend(modalBase.wrapper)
-
         const api = {
             id: id,
 
             el: modalBase.wrapper,
 
             bind: (el) => {
+                document.body.prepend(modalBase.wrapper)
+                
                 function bindClick(el) {
                     el.addEventListener("click", () => {
                         modalBase.wrapper.classList.remove("hidden")
@@ -129,6 +129,7 @@ export class Modal {
             },
 
             open: () => {
+                document.body.prepend(modalBase.wrapper)
                 modalBase.wrapper.classList.remove("hidden")
                 showBackdrop()
             },

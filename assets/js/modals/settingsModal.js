@@ -2,7 +2,7 @@ import { Modal } from "../modalsHandler/engine.js"
 import { GLS } from "../lib.js"
 
 export async function getSettingsModal({ platform }) {
-    const gls = await GLS.init()
+    const gls = await GLS.initLocal()
     
     function lgls(string, replacements) {
         return gls.get(`modals.appearance.${string}`, replacements)

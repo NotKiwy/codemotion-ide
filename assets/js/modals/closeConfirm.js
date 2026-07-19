@@ -1,6 +1,9 @@
+import { GLS } from "../lib.js";
 import { Modal } from "../modalsHandler/engine.js";
 
-export function closeConfirmModal({ fileName, gls }) {
+export async function closeConfirmModal({ fileName }) {
+    const gls = await GLS.initLocal()
+
     const modal = Modal.create({
         id: "closeConfirmModal",
         name: "closeConfirmModal",

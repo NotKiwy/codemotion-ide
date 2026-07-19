@@ -245,7 +245,7 @@ async function checkStatus({ updateSplash }) {
     }
 
     const hosts = [
-        { name: "Developers server", url: "https://dev.yurba.one" }
+        { name: "API Server", url: API }
     ];
 
     for (let i = 0; i < hosts.length; i++) {
@@ -341,7 +341,7 @@ async function requestAddBug({ title = "Unnamed", description = "No description 
     console.log(`Request bug creation. assign to: ${assignTo} (allowed: ${assignTo != 0})`)
 
     try {
-        const response = await fetch(`${API}/addBug.php`, {
+        const response = await fetch(`${API}/bug/add`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${userToken}`
@@ -368,7 +368,7 @@ async function requestMakeVerifyBug({ bugid }) {
     formData.append('bugid', bugid);
 
     try {
-        const response = await fetch(`${API}/makeVerifyBug.php`, {
+        const response = await fetch(`${API}/bug/makeVerify`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${userToken}`
@@ -392,7 +392,7 @@ async function requestGetYourOrgColleagues() {
     const userToken = await getUserToken()
 
     try {
-        const response = await fetch(`${API}/organizations/getYourOrgColleagues.php`, {
+        const response = await fetch(`${API}/org/getYourColleagues`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${userToken}`
@@ -421,7 +421,7 @@ async function requestCreateOrganization({ name, description, website }) {
     formData.append('website', website);
 
     try {
-        const response = await fetch(`${API}/organizations/createOrg.php`, {
+        const response = await fetch(`${API}/org/create`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${userToken}`
@@ -445,7 +445,7 @@ async function requestExploreOrganizations() {
     const userToken = await getUserToken()
 
     try {
-        const response = await fetch(`${API}/organizations/getExploreOrgs.php`, {
+        const response = await fetch(`${API}/org/explore`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${userToken}`

@@ -59,6 +59,7 @@
         "flashot": "^1.4.1",
         "node-global-key-listener": "^0.3.0",
         "node-gyp": "^12.4.0",
+        "oxc-parser": "^0.140.0",
         "ws": "^8.19.0"
     }
 }

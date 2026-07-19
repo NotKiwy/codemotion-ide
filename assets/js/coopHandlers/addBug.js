@@ -1,4 +1,3 @@
-import { GLS } from "../lib.js"
 import { getCurrentUserDataFromAPI } from "../user.js"
 
 export async function addBug({ bugModal, bugName, bugContent, bugPriority, bugPrivate, bugAssignTo }) {

@@ -2,7 +2,7 @@ import { Modal } from "../modalsHandler/engine.js"
 import { GLS } from "../lib.js"
 
 export async function getLogoutModal() {
-    const gls = await GLS.init()
+    const gls = await GLS.initLocal()
 
     function lgls(string) {
         return gls.get(`modals.logout.${string}`)

@@ -37,7 +37,7 @@ document.querySelector("#refresh_bugs").addEventListener("click", (e) => {
 
 export async function handleBugsTab(bugsObject) {
     console.log(bugsObject)
-    const gls = await GLS.init()
+    const gls = await GLS.initLocal()
 
     if (!root) return
 

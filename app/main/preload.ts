@@ -116,10 +116,10 @@ contextBridge.exposeInMainWorld('electron', {
     getDirname: () => ipcRenderer.invoke("get-dirname"),
     getPlatform: () => ipcRenderer.invoke("get-platform"),
 
-    typescriptDiagnostic: (code: string) => ipcRenderer.invoke("typescript-diagnostic", code),
-    javascriptDiagnostic: (code: string) => ipcRenderer.invoke("javascript-diagnostic", code),
-    javascriptAST: (code: string) => ipcRenderer.invoke("javascript-ast", code),
-    typescriptAST: (code: string) => ipcRenderer.invoke("typescript-ast", code),
+    typescriptDiagnostic: (code: string, language?: string) => ipcRenderer.invoke("typescript-diagnostic", code, language),
+    javascriptDiagnostic: (code: string, language?: string) => ipcRenderer.invoke("javascript-diagnostic", code, language),
+    javascriptAST: (code: string, language?: string) => ipcRenderer.invoke("javascript-ast", code, language),
+    typescriptAST: (code: string, language?: string) => ipcRenderer.invoke("typescript-ast", code, language),
     golangAST: (code: string) => ipcRenderer.invoke("golang-ast", code),
 
     // for extensions

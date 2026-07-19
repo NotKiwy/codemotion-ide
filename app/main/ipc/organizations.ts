@@ -15,7 +15,7 @@ ipcMain.handle('get-org-data-from-api', async (_: IpcMainInvokeEvent, orgID: num
     const userToken = await getUserToken()
 
     try {
-        const response = await fetch(`${API}/getOrg.php?id=${orgID}`, {
+        const response = await fetch(`${API}/org/get?id=${orgID}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${userToken}`
@@ -39,7 +39,7 @@ ipcMain.handle('remove-org', async (_: IpcMainInvokeEvent, orgID: number) => {
     formData.append('id', orgID);
 
     try {
-        const response = await fetch(`${API}/organizations/removeOrg.php`, {
+        const response = await fetch(`${API}/org/remove`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${userToken}`
@@ -64,7 +64,7 @@ ipcMain.handle('join-org', async (_: IpcMainInvokeEvent, inviteCode: string) => 
     formData.append('invite_code', inviteCode);
 
     try {
-        const response = await fetch(`${API}/organizations/joinOrg.php`, {
+        const response = await fetch(`${API}/org/join`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${userToken}`
@@ -91,7 +91,7 @@ ipcMain.handle('reset-org-invite-code', async (_: IpcMainInvokeEvent, orgid: num
     formData.append('org_id', orgid);
 
     try {
-        const response = await fetch(`${API}/organizations/resetInviteCode.php`, {
+        const response = await fetch(`${API}/org/resetInviteCode`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${userToken}`

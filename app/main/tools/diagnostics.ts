@@ -2,77 +2,92 @@ import { ipcMain, IpcMainInvokeEvent } from "electron"
 import { Worker } from "worker_threads"
 import path from "path"
 
-type DiagnosticResult = unknown
+type DiagnosticResult = unknown[]
+type DiagnosticLanguage = "js" | "jsx" | "ts" | "tsx" | "dts"
 
-type PendingResolver = ((value: DiagnosticResult) => void) | null
+type WorkerKey = "js" | "ts"
 
-type WorkerMap = {
-    js: Worker
-    ts: Worker
+type WorkerMap = Record<WorkerKey, Worker>
+type PendingMap = Record<WorkerKey, Map<number, (value: DiagnosticResult) => void>>
+type WorkerResponse = { id?: number, diagnostics?: DiagnosticResult }
+
+let nextRequestId = 0
+
+function normalizeLanguage(language: unknown, fallback: DiagnosticLanguage): DiagnosticLanguage {
+    const normalized = String(language || "").trim().toLowerCase().replace(/^\./, "")
+    if (["js", "jsx", "ts", "tsx", "dts"].includes(normalized)) {
+        return normalized as DiagnosticLanguage
+    }
+    if (["mjs", "cjs", "es6"].includes(normalized)) return "js"
+    if (["mts", "cts"].includes(normalized)) return "ts"
+    return fallback
 }
 
-type PendingMap = {
-    js: PendingResolver
-    ts: PendingResolver
-}
-
-function createWorker(filename: string): Worker {
-    const worker = new Worker(path.join(__dirname, filename))
-
-    worker.on("error", (err: Error) => {
-        console.error(`Worker error (${filename}):`, err)
-    })
-
-    worker.on("exit", (code: number) => {
-        if (code !== 0) {
-            console.error(`Worker (${filename}) exited with code ${code}`)
-        }
-    })
-
-    return worker
+function createWorker(): Worker {
+    return new Worker(path.join(__dirname, "js-ts/diagnosticWorker.js"))
 }
 
 const workers: WorkerMap = {
-    js: createWorker("javascript/diagnosticsJsWorker.js"),
-    ts: createWorker("typescript/diagnosticsTsWorker.js"),
+    js: createWorker(),
+    ts: createWorker(),
 }
 
 const pending: PendingMap = {
-    js: null,
-    ts: null,
+    js: new Map(),
+    ts: new Map(),
 }
 
-workers.js.on("message", (diagnostics: DiagnosticResult) => {
-    if (pending.js) {
-        pending.js(diagnostics)
-        pending.js = null
-    }
-})
+function resolvePending(workerKey: WorkerKey, id: number | undefined, diagnostics: DiagnosticResult) {
+    if (id === undefined) return
+    const resolve = pending[workerKey].get(id)
+    if (!resolve) return
 
-workers.ts.on("message", (diagnostics: DiagnosticResult) => {
-    if (pending.ts) {
-        pending.ts(diagnostics)
-        pending.ts = null
-    }
-})
+    pending[workerKey].delete(id)
+    resolve(diagnostics)
+}
 
-workers.js.on("error", (err) => {
-    console.error("JS worker error:", err)
-})
-workers.ts.on("error", (err) => {
-    console.error("TS worker error:", err)
-})
+function rejectAllPending(workerKey: WorkerKey) {
+    for (const resolve of pending[workerKey].values()) resolve([])
+    pending[workerKey].clear()
+}
 
-ipcMain.handle("javascript-diagnostic", (_event: IpcMainInvokeEvent, code: string): Promise<DiagnosticResult> => {
-    return new Promise((resolve) => {
-        pending.js = resolve
-        workers.js.postMessage(code)
+for (const workerKey of ["js", "ts"] as const) {
+    workers[workerKey].on("message", (response: WorkerResponse) => {
+        resolvePending(workerKey, response?.id, response?.diagnostics || [])
     })
-})
 
-ipcMain.handle("typescript-diagnostic", (_event: IpcMainInvokeEvent, code: string): Promise<DiagnosticResult> => {
-    return new Promise((resolve) => {
-        pending.ts = resolve
-        workers.ts.postMessage(code)
+    workers[workerKey].on("error", (error: Error) => {
+        console.error(`${workerKey.toUpperCase()} diagnostics worker error:`, error)
+        rejectAllPending(workerKey)
     })
-})
+
+    workers[workerKey].on("exit", (code: number) => {
+        if (code !== 0) console.error(`${workerKey.toUpperCase()} diagnostics worker exited with code ${code}`)
+        rejectAllPending(workerKey)
+    })
+}
+
+function requestDiagnostics(workerKey: WorkerKey, code: string, lang: DiagnosticLanguage): Promise<DiagnosticResult> {
+    const id = ++nextRequestId
+
+    return new Promise(resolve => {
+        pending[workerKey].set(id, resolve)
+        workers[workerKey].postMessage({ id, code, lang })
+    })
+}
+
+ipcMain.handle(
+    "javascript-diagnostic",
+    (_event: IpcMainInvokeEvent, code: string, language?: unknown): Promise<DiagnosticResult> => {
+        const lang = normalizeLanguage(language, "js")
+        return requestDiagnostics("js", code, lang)
+    }
+)
+
+ipcMain.handle(
+    "typescript-diagnostic",
+    (_event: IpcMainInvokeEvent, code: string, language?: unknown): Promise<DiagnosticResult> => {
+        const lang = normalizeLanguage(language, "ts")
+        return requestDiagnostics("ts", code, lang)
+    }
+)
