@@ -24,7 +24,8 @@ export async function requestUser() {
     }
     else {
         return {
-            success: false
+            success: false,
+            result: user.result.result
         }
     }
 }
@@ -45,7 +46,7 @@ export async function getCurrentUserDataFromAPI(gls, properties = {}) {
 
     setUserPcInfo()
 
-    if (!user.success) return false;
+    if (!user.success) return user;
 
     const userJSON = user.user;
     const userOrgs = user.organizations;

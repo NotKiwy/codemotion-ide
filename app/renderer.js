@@ -222,11 +222,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     else {
         getCurrentUserDataFromAPI(gls).then((e) => {
+            console.log(e)
             if (!e.success) {
                 const errEl = loader?.querySelector(".loader-msg");
                 if (errEl) {
                     errEl.classList.remove("hidden");
-                    errEl.textContent = `Error: ${e.result.result}`;
+                    errEl.textContent = `Error: ${e.result}`;
                 }
             } else {
                 loader?.classList.add("hidden");
