@@ -6,10 +6,10 @@
     "main": "app/dist/main.js",
     "scripts": {
         "build": "tsc",
+        "cdbuild": "cd codemirror && npm i && npm run build",
         "start": "npm run cdbuild && npm run build && electron .",
-        "cdbuild": "cd codemirror && npm run build",
-        "dist": "npm run build && electron-builder",
-        "dist-linux": "npm run build && electron-builder --linux"
+        "dist": "npm run cdbuild && npm run build && electron-builder",
+        "dist-linux": "npm run cdbuild && npm run build && electron-builder --linux"
     },
     "build": {
         "appId": "com.codemotion",
