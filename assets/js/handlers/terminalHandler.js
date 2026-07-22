@@ -39,8 +39,11 @@ export class Console {
         this.buffer = ""
         this.history = []
         this.historyIndex = -1
-        this.cwd = startPath || ""
+        this.cwd = this.toDir(startPath) || ""
         this.isWaitingForOutput = false
+        this.tabMatches = []
+        this.tabIndex = -1
+        this.tabPrefix = ""
 
         this.customCommandDescriptions = {
             fs: "Fullscreen mode",
@@ -82,6 +85,16 @@ export class Console {
         this.console.onHide(() => this.dispose())
     }
 
+    toDir(p) {
+        if (!p) return ""
+        if (p.endsWith("/") || p.endsWith("\\")) return p
+        const lastSlash = Math.max(p.lastIndexOf("/"), p.lastIndexOf("\\"))
+        if (lastSlash <= 0) return p
+        const lastSegment = p.substring(lastSlash + 1)
+        if (lastSegment.includes(".")) return p.substring(0, lastSlash)
+        return p
+    }
+
     fit() {
         if (this.disposed) return
         if (this.isPanelResizing) return
@@ -99,6 +112,24 @@ export class Console {
     }
 
     registerEvents() {
+        this.term.attachCustomKeyEventHandler((e) => {
+            if (e.ctrlKey && e.shiftKey && e.code === "KeyC") {
+                const selection = this.term.getSelection()
+                if (selection) navigator.clipboard.writeText(selection)
+                return false
+            }
+            if (e.ctrlKey && e.shiftKey && e.code === "KeyV") {
+                navigator.clipboard.readText().then(text => {
+                    if (text) {
+                        const clean = text.replace(/[\r\n]+/g, " ")
+                        this.buffer += clean
+                        this.term.write(clean)
+                    }
+                }).catch(() => {})
+                return false
+            }
+            return true
+        })
         this.term.onData(data => this.handleInput(data))
     }
 
@@ -107,16 +138,32 @@ export class Console {
 
         if(code === 3) { 
             if(this.isWaitingForOutput) {
-                console.log('[Console] Ctrl+C pressed')
                 this.term.write("^C\r\n")
                 window.electron?.killProcess?.()
                 this.isWaitingForOutput = false
+            } else if(this.buffer.length > 0) {
+                this.term.write("^C\r\n")
+                this.buffer = ""
             }
+            this.prompt()
+            return
+        }
+
+        if(code === 22) {
+            navigator.clipboard.readText().then(text => {
+                if (text) {
+                    const clean = text.replace(/[\r\n]+/g, " ")
+                    this.buffer += clean
+                    this.term.write(clean)
+                }
+            }).catch(() => {})
             return
         }
 
         if(code === 13) {
             this.term.write("\r\n")
+            this.tabMatches = []
+            this.tabIndex = -1
 
             if(this.isWaitingForOutput) {
                 const input = this.buffer + "\n"
@@ -137,16 +184,48 @@ export class Console {
             
             if(this.customCommands[firstWord]) {
                 this.customCommands[firstWord]()
+                this.history.push(trimmedBuffer)
+                this.historyIndex = this.history.length
+                this.buffer = ""
                 this.prompt()
             } else {
-                console.log(`[Console] Executing: ${trimmedBuffer}`)
-                this.isWaitingForOutput = true
-                window.electron?.sendCommand?.({ cmd: trimmedBuffer, cwd: this.cwd })
+                const cdMatch = trimmedBuffer.match(/^cd\s+(.*)$/i)
+                if (cdMatch) {
+                    const target = cdMatch[1].trim().replace(/\/$/, "")
+                    let newPath = this.cwd
+                    if (target === "..") {
+                        const parts = this.cwd.replace(/[\\/]+$/, "").split(/[\\/]/)
+                        parts.pop()
+                        newPath = parts.join("\\") || "C:\\"
+                    } else if (target === ".") {
+                        newPath = this.cwd
+                    } else if (target.includes(":\\") || target.startsWith("/")) {
+                        newPath = target
+                    } else {
+                        newPath = this.cwd + "\\" + target
+                    }
+                    this.history.push(trimmedBuffer)
+                    this.historyIndex = this.history.length
+                    this.buffer = ""
+                    window.electron.readDirTree(newPath, { maxDepth: 0 }).then(res => {
+                        if (res) {
+                            this.cwd = newPath
+                        } else {
+                            this.term.writeln(`\x1b[31mcd: no such file or directory: ${target}\x1b[0m`)
+                        }
+                        this.prompt()
+                    }).catch(() => {
+                        this.term.writeln(`\x1b[31mcd: no such file or directory: ${target}\x1b[0m`)
+                        this.prompt()
+                    })
+                } else {
+                    this.history.push(trimmedBuffer)
+                    this.historyIndex = this.history.length
+                    this.buffer = ""
+                    this.isWaitingForOutput = true
+                    window.electron?.sendCommand?.({ cmd: trimmedBuffer, cwd: this.cwd })
+                }
             }
-            this.history.push(trimmedBuffer)
-            this.historyIndex = this.history.length
-            this.buffer = ""
-            return
         }
 
         if (code === 127) {
@@ -176,6 +255,10 @@ export class Console {
 
         this.buffer += data
         this.term.write(data)
+        if (data !== '\t') {
+            this.tabMatches = []
+            this.tabIndex = -1
+        }
 
         if(this.isWaitingForOutput) {
             window.electron?.sendInput?.(data)
@@ -191,16 +274,53 @@ export class Console {
         this.term.write(str)
     }
 
-    autocomplete() {
+    async autocomplete() {
         const commands = Object.keys(this.customCommands)
-        const matches = commands.filter(cmd => cmd.startsWith(this.buffer))
-        if (matches.length === 1) {
-            this.replaceBuffer(matches[0])
-        } else if(matches.length > 1) {
-            this.term.writeln("\r\n" + matches.join(" "))
-            this.prompt()
-            this.term.write(this.buffer)
+        const parts = this.buffer.split(/\s+/)
+        const lastPart = parts[parts.length - 1] || ""
+
+        if (this.tabMatches.length > 0) {
+            this.tabIndex = (this.tabIndex + 1) % this.tabMatches.length
+            const completed = this.tabMatches[this.tabIndex]
+            if (parts.length <= 1 && commands.includes(completed)) {
+                this.replaceBuffer(completed + " ")
+            } else {
+                parts[parts.length - 1] = this.tabPrefix_path + completed
+                this.replaceBuffer(parts.join(" "))
+            }
+            return
         }
+
+        let dir = this.cwd
+        let pathPrefix = ""
+        if (lastPart.includes("/") || lastPart.includes("\\")) {
+            const lastSlash = Math.max(lastPart.lastIndexOf("/"), lastPart.lastIndexOf("\\"))
+            pathPrefix = lastPart.substring(0, lastSlash + 1)
+            const relDir = lastPart.substring(0, lastSlash) || lastPart.substring(0, 1)
+            dir = (relDir.includes(":\\") || relDir.startsWith("/")) ? relDir : this.cwd + "\\" + relDir
+        }
+
+        try {
+            const res = await window.electron.readDirTree(dir, { maxDepth: 0 })
+            if (!res || !Array.isArray(res)) return
+
+            const entries = res.map(e => typeof e === "string" ? e : e.name || "")
+            const lower = lastPart.toLowerCase()
+            const fileMatches = entries.filter(e => e.toLowerCase().startsWith(lastPart.split(/[\\/]/).pop().toLowerCase()))
+
+            if (fileMatches.length === 0) return
+
+            this.tabMatches = fileMatches
+            this.tabIndex = 0
+            this.tabPrefix_path = pathPrefix
+
+            if (fileMatches.length === 1) {
+                parts[parts.length - 1] = pathPrefix + fileMatches[0]
+                this.replaceBuffer(parts.join(" "))
+            } else {
+                this.replaceBuffer(pathPrefix + fileMatches[0])
+            }
+        } catch (e) {}
     }
 
     parseCommand(cmd) {

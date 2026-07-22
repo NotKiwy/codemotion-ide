@@ -20,7 +20,7 @@ import { getCurrentUserDataFromAPI } from "../assets/js/user.js"
 
 import * as object from "../assets/js/objects.js"
 
-import { openTab, reopenLastClosed, activateTab, recentlyClosed, tabsByPath, currentPath, updateTabPath } from "../assets/js/explorerTree/tabHandler.js"
+import { openTab, reopenLastClosed, activateTab, recentlyClosed, tabsByPath, currentPath, updateTabPath, closeFolder } from "../assets/js/explorerTree/tabHandler.js"
 import { handlePopovers } from "../assets/js/handlers/handlePopovers.js"
 import { initExtensions } from "../assets/js/extensionsHandler/extensionsHandler.js"
 import { sendDebugMsg } from "../assets/js/handlers/debuggerSignalHandlers.js"
@@ -144,6 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     handleOnWheelScrollX()
 
     const pathContext = {}
+    window.__pathContext = pathContext
 
     document.querySelector(".code-start__main-logo").src = appIcon
 
@@ -436,6 +437,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                     settings: settings
                 }
             )
+        })
+    })
+
+    document.querySelectorAll("#close_folder").forEach(btn => {
+        btn.addEventListener("click", () => {
+            closeFolder();
         })
     })
 })

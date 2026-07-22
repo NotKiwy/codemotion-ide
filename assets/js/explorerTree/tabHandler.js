@@ -22,6 +22,7 @@ import {
     GLS,
     fitAceHeight,
     setAppTitle,
+    setTabName,
     EditorAdapter
 } from "../lib.js"
 import { BottomWindow, closeAllWindows } from "../handlers/BottomWindowHandler.js"
@@ -344,9 +345,8 @@ function initializeGlobalButtons(settings = {}) {
         cssMinifyBtn.addEventListener("click", handleCSSMinifyClick);
     }
 
-    const handleCodeConsoleClick = (e) => {
+    const handleCodeConsoleClick = async (e) => {
         e.preventDefault()
-        if (!currentPath) return;
 
         const globalTerminalWindow = new BottomWindow("globalTerminal", { title: "Terminal" })
         globalTerminalWindow.show()
@@ -354,7 +354,15 @@ function initializeGlobalButtons(settings = {}) {
         globalTerminalWindow.autoScrollBottom()
         globalTerminalWindow.win.classList.add("console")
 
-        new Console(globalTerminalWindow, currentPath)
+        const rootPath = window.__pathContext?.rootPath
+        if (rootPath) {
+            new Console(globalTerminalWindow, rootPath)
+        } else if (currentPath) {
+            new Console(globalTerminalWindow, currentPath)
+        } else {
+            const pcInfo = await window.electron.getUserPcInfo()
+            new Console(globalTerminalWindow, pcInfo.homedir)
+        }
     }
     const codeConsoleBtn = document.querySelector("#code-console");
     if (codeConsoleBtn) {
@@ -1241,4 +1249,49 @@ export function closeAllTabs() {
     for (const path of paths) {
         closeTab(path);
     }
+}
+
+const codeConsoleBtn = document.querySelector("#code-console");
+if (codeConsoleBtn) {
+    codeConsoleBtn.addEventListener("click", async (e) => {
+        e.preventDefault()
+
+        const globalTerminalWindow = new BottomWindow("globalTerminal", { title: "Terminal" })
+        globalTerminalWindow.show()
+        globalTerminalWindow.clear()
+        globalTerminalWindow.autoScrollBottom()
+        globalTerminalWindow.win.classList.add("console")
+
+        const rootPath = window.__pathContext?.rootPath
+        if (rootPath) {
+            new Console(globalTerminalWindow, rootPath)
+        } else if (currentPath) {
+            new Console(globalTerminalWindow, currentPath)
+        } else {
+            const pcInfo = await window.electron.getUserPcInfo()
+            new Console(globalTerminalWindow, pcInfo.homedir)
+        }
+    });
+}
+
+export function closeFolder() {
+    closeAllTabs();
+
+    const filesPanel = document.querySelector('.explorer-elements[data-tab="files"]');
+    if (filesPanel) {
+        filesPanel.innerHTML = `
+            <div class="explorer-elements__files-empty">
+                <span gls="explorer.emptyBeforeIcon"></span>
+                <span class="material-symbols-rounded outline">folder_open</span>
+                <span gls="explorer.emptyAfterIcon"></span>
+            </div>
+        `;
+    }
+
+    if (window.__pathContext) {
+        Object.keys(window.__pathContext).forEach(k => delete window.__pathContext[k]);
+    }
+
+    setTabName("Explorer");
+    setAppTitle();
 }
