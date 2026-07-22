@@ -7,6 +7,67 @@ import { bus } from "../bus.js"
 const installedExtensionModalData = []
 const extensionErrors = {}
 
+const RISKY_PERMISSIONS = [
+    "shell.run",
+    "shell.exec",
+    "shell.kill",
+    "window.create",
+    "window.close"
+]
+
+function hasRiskyPermissions(permissions) {
+    return permissions.filter(p => RISKY_PERMISSIONS.includes(p))
+}
+
+function showRiskyPermissionWarning({ displayName, name, riskyPerms }) {
+    return new Promise((resolve) => {
+        const modal = Modal.create({
+            id: "riskyPermissionWarning",
+            name: "Risky Permissions",
+            title: "Risky Permissions Detected",
+            modalClassList: ["window"],
+            size: "mini",
+            content: [
+                {
+                    type: "row",
+                    classList: ["modal-content"],
+                    items: [
+                        {
+                            type: "container",
+                            id: "perm-warning-body",
+                            html: `
+                                <div class="confirm-desc" style="margin-bottom:12px">You are launching an <b>unverified</b> extension that uses risky permissions:<br><b>${displayName}</b> <span style="opacity:.5">(${name})</span></div>
+                                <div style="background:var(--block-divider-border-color);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:12px;font-family:'JetBrains Mono',monospace">Uses: ${riskyPerms.join(", ")}</div>
+                                <div style="font-size:11px;opacity:.45;line-height:1.5">You can disable this warning in Settings &gt; Extensions.</div>
+                                <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+                                    <button class="modal-button default" id="perm-warning-no">No, disable it</button>
+                                    <button class="modal-button default" id="perm-warning-yes">Yes, enable it</button>
+                                </div>
+                            `
+                        }
+                    ]
+                }
+            ]
+        })
+
+        modal.open()
+
+        const noBtn = modal.el.querySelector("#perm-warning-no")
+        const yesBtn = modal.el.querySelector("#perm-warning-yes")
+
+        if (noBtn) noBtn.addEventListener("click", () => {
+            modal.close()
+            modal.destroy()
+            resolve(false)
+        })
+        if (yesBtn) yesBtn.addEventListener("click", () => {
+            modal.close()
+            modal.destroy()
+            resolve(true)
+        })
+    })
+}
+
 function checkPackage(object) {
     if (!object || Object.keys(object).length === 0) {
         return { success: false, msg: "File missing or empty" }
@@ -294,6 +355,25 @@ export async function initExtensions() {
         // 
         
         async function runExtension() {
+            const riskyPerms = hasRiskyPermissions(permissionsArray)
+
+            if (riskyPerms.length > 0) {
+                const disableWarning = settings?.extensions?.disableRiskyPermissionWarning === true
+
+                if (!disableWarning) {
+                    const approved = await showRiskyPermissionWarning({
+                        displayName: displayName,
+                        name: name,
+                        riskyPerms: riskyPerms
+                    })
+
+                    if (!approved) {
+                        sendDebugWarn(`${name}: extension disabled by user (risky permissions declined)`)
+                        return
+                    }
+                }
+            }
+
             const runResult = await window.electron.runExtension(
                 extensionMainFileContentRes.result,
                 permissionsArray,
