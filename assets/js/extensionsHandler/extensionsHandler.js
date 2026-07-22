@@ -68,17 +68,50 @@ function showRiskyPermissionWarning({ displayName, name, riskyPerms }) {
     })
 }
 
+const VALID_PLATFORMS = ["windows", "win", "macos", "mac", "linux", "lin", "all"]
+const PLATFORM_ALIASES = { win: "windows", mac: "macos", lin: "linux" }
+
+function normalizePlatform(p) {
+    return PLATFORM_ALIASES[p] || p
+}
+
+function isPlatformCompatible(platformArray, currentPlatform) {
+    const normalized = platformArray.map(normalizePlatform)
+    if (normalized.includes("all")) return true
+    return normalized.includes(currentPlatform)
+}
+
 function checkPackage(object) {
     if (!object || Object.keys(object).length === 0) {
         return { success: false, msg: "File missing or empty" }
     }
 
-    const requireFields = ["version", "name", "displayName", "main", "permissions", "description", "activeOn"]
+    const requireFields = ["version", "name", "displayName", "main", "permissions", "description", "activeOn", "platform"]
 
     for (const f of requireFields) {
         if (!(f in object)) {
             return { success: false, msg: `Missing field: ${f}` }
         }
+    }
+
+    const platform = object.platform
+
+    if (typeof platform === "string") {
+        if (!VALID_PLATFORMS.includes(platform)) {
+            return { success: false, msg: `Invalid platform "${platform}". Valid: ${VALID_PLATFORMS.join(", ")}` }
+        }
+        object.platform = [platform]
+    } else if (Array.isArray(platform)) {
+        if (platform.length === 0) {
+            return { success: false, msg: "Field 'platform' must be a non-empty array" }
+        }
+        for (const p of platform) {
+            if (!VALID_PLATFORMS.includes(p)) {
+                return { success: false, msg: `Invalid platform "${p}". Valid: ${VALID_PLATFORMS.join(", ")}` }
+            }
+        }
+    } else {
+        return { success: false, msg: "Field 'platform' must be a string or array" }
     }
 
     return { success: true, msg: "All fine" }
@@ -144,6 +177,7 @@ export async function initExtensions() {
 
     const names = extensionsRequest.result
     const settings = await window.electron.readSettings()
+    const currentPlatform = await window.electron.getPlatform()
 
     // PROCEED EACH EXT
     for (const name of names) {
@@ -316,8 +350,13 @@ export async function initExtensions() {
             }
         }
         
-        // 
-        
+        // platform check
+        const extPlatforms = Array.isArray(extensionPackage.platform) ? extensionPackage.platform : [extensionPackage.platform]
+        if (!isPlatformCompatible(extPlatforms, currentPlatform)) {
+            sendDebugWarn(`${name}: skipped — not compatible with ${currentPlatform} (supports: ${extPlatforms.join(", ")})`)
+            continue
+        }
+
         // activation events
         const activeOnEvents = {
             load: () => true,
