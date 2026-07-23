@@ -632,6 +632,7 @@ async function showExtensionSettings(extensionName, settingsDef, extensionPath) 
             input.value = currentValues[s.id] ?? s.default ?? 0
         } else if (s.type === "input") {
             input.value = currentValues[s.id] ?? ""
+            if (input.value) input.classList.add("focused")
         } else if (s.type === "dropdown") {
             const saved = currentValues[s.id] ?? s.default ?? ""
             if (saved) {
