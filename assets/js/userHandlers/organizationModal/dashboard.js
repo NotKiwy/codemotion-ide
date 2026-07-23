@@ -147,7 +147,7 @@ export function dashboardModalHandle({ userOrgs, element, orgModal }) {
         const orgItemData = {}
 
         if (org.verified == 1) {
-            orgItemData["badge"] = { color: "#3264a8", icon: "check" }
+            orgItemData["badge"] = { color: "rgb(47 119 255)", icon: "check" }
         }
         if (org.description) {
             orgItemData["secondary"] = truncateString(org.description, 50)
