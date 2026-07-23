@@ -205,6 +205,7 @@ function contentItemsHandler(element, itemsData) {
             const image = valid(item.image) ?? false
             const tags = validArray(item.tags) ?? []
             const buttons = validArray(item.buttons) ?? []
+            const toggle = valid(item.toggle) ?? null
 
             const extensionItemElement = renderExtensionItem(
                 {
@@ -214,7 +215,8 @@ function contentItemsHandler(element, itemsData) {
                     image: image,
                     tags: tags,
                     buttons: buttons,
-                    id: id
+                    id: id,
+                    toggle: toggle
                 }
             )
 

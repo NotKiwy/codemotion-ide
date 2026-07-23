@@ -179,6 +179,7 @@ export async function initExtensions() {
     const names = extensionsRequest.result
     const settings = await window.electron.readSettings()
     const currentPlatform = await window.electron.getPlatform()
+    const disabledExtensions = settings?.extensions?.disabledExtensions || []
 
     // PROCEED EACH EXT
     for (const name of names) {
@@ -198,7 +199,8 @@ export async function initExtensions() {
                     image: name,
                     permissions: new Set(),
                     path: "",
-                    extensionName: name
+                    extensionName: name,
+                    enabled: true
                 })
             )
             continue
@@ -225,7 +227,8 @@ export async function initExtensions() {
                     image: name,
                     permissions: new Set(),
                     path: extensionPath,
-                    extensionName: name
+                    extensionName: name,
+                    enabled: true
                 })
             )
             continue
@@ -249,6 +252,8 @@ export async function initExtensions() {
             isDev = settings.app.devMode
         }
 
+        const isEnabled = !disabledExtensions.includes(name)
+
         // add extension to the list
 
         installedExtensionModalData.push(
@@ -260,9 +265,15 @@ export async function initExtensions() {
                 permissions: allPermissions,
                 path: extensionPath,
                 extensionName: name,
-                settings: extensionPackage.settings
+                settings: extensionPackage.settings,
+                enabled: isEnabled
             })
         )
+
+        if (!isEnabled) {
+            sendDebugWarn(`${name}: extension disabled by user`)
+            continue
+        }
 
         if(!Array.isArray(activeOn)) {
             sendDebugError(`${name}: activeOn key in package.json must be array`)
@@ -647,7 +658,7 @@ async function showExtensionSettings(extensionName, settingsDef, extensionPath) 
     })
 }
 
-function createInstalledExtensionsModalTemplate({ title, subtitle, description, image, permissions, path, extensionName, settings: extSettings }) {
+function createInstalledExtensionsModalTemplate({ title, subtitle, description, image, permissions, path, extensionName, settings: extSettings, enabled }) {
     const tags = []
 
     for (const p of permissions) {
@@ -696,7 +707,21 @@ function createInstalledExtensionsModalTemplate({ title, subtitle, description, 
         description: description,
         image: image,
         tags: tags,
-        buttons: buttons
+        buttons: buttons,
+        toggle: extensionName ? {
+            checked: enabled,
+            onChange: async (isChecked) => {
+                const settings = await window.electron.readSettings()
+                const disabled = settings?.extensions?.disabledExtensions || []
+                let updated
+                if (isChecked) {
+                    updated = disabled.filter(n => n !== extensionName)
+                } else {
+                    updated = [...disabled, extensionName]
+                }
+                await window.electron.setSettings({ extensions: { disabledExtensions: updated } })
+            }
+        } : null
     }
 
     return template
